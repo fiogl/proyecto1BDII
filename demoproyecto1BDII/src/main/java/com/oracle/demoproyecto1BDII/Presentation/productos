@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Productos - Pink Hazze</title>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-1 p-6">
+        <div class="container">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <div>
+                        <h1 class="text-3xl font-bold">Gestión de Productos</h1>
+                        <p style="color: var(--muted-foreground);">Administra tu catálogo de productos de cuidado de la piel</p>
+                    </div>
+                    <button onclick="openProductModal()" class="btn btn-primary">
+                        <i class="fa-solid fa-plus icon"></i>
+                        Nuevo Producto
+                    </button>
+                </div>
+
+                <!-- Filtros -->
+                <div class="card mb-6">
+                    <div class="card-content">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="form-label">Buscar</label>
+                                <input type="text" id="searchInput" class="form-input" placeholder="Nombre del producto...">
+                            </div>
+                            <div>
+                                <label class="form-label">Categoría</label>
+                                <select id="categoryFilter" class="form-select">
+                                    <option value="">Todas las categorías</option>
+                                    <option value="Limpiadores">Limpiadores</option>
+                                    <option value="Hidratantes">Hidratantes</option>
+                                    <option value="Serums">Serums</option>
+                                    <option value="Protectores">Protectores Solares</option>
+                                    <option value="Mascarillas">Mascarillas</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Stock</label>
+                                <select id="stockFilter" class="form-select">
+                                    <option value="">Todos</option>
+                                    <option value="disponible">En stock</option>
+                                    <option value="bajo">Stock bajo (&lt;10)</option>
+                                    <option value="agotado">Agotado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de productos -->
+                <div class="card">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Precio</th>
+                                <th>Stock</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productTableBody">
+                            <!-- Los productos se cargarán aquí dinámicamente -->
+                            <tr th:if="${productos != null and !productos.empty}" th:each="producto : ${productos}">
+                                <td>
+                                    <div>
+                                        <div class="font-semibold" th:text="${producto.nombre}">Producto</div>
+                                        <div class="text-sm" style="color: var(--muted-foreground);" th:text="${producto.descripcion}">Descripción</div>
+                                    </div>
+                                </td>
+                                <td th:text="${producto.categoria}">Categoría</td>
+                                <td th:text="'$' + ${producto.precio}">$0.00</td>
+                                <td>
+                                    <span class="px-2 py-1 rounded text-sm"
+                                          th:classappend="${producto.stock > 10 ? 'bg-green-100 text-green-800' : producto.stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}"
+                                          th:text="${producto.stock}">0</span>
+                                </td>
+                                <td>
+                                    <span class="px-2 py-1 rounded text-sm"
+                                          th:classappend="${producto.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
+                                          th:text="${producto.stock > 0 ? 'Disponible' : 'Agotado'}">Estado</span>
+                                </td>
+                                <td>
+                                    <div class="flex gap-2">
+                                        <button th:onclick="'editProduct(' + ${producto.id} + ')'" class="btn btn-outline btn-sm">
+                                            <i class="fa-solid fa-pen-to-square icon"></i>
+                                        </button>
+                                        <button th:onclick="'deleteProduct(' + ${producto.id} + ')'" class="btn btn-outline btn-sm" style="color: #dc2626;">
+                                            <i class="fa-solid fa-trash icon"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Productos de ejemplo si no hay datos -->
+                            <tr th:if="${productos == null or productos.empty}">
+                                <td colspan="6" class="text-center p-6" style="color: var(--muted-foreground);">
+                                    No hay productos registrados.
+                                    <button onclick="openProductModal()" class="btn btn-primary btn-sm mt-2">
+                                        Agregar el primero
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Paginación -->
+                <div class="pagination">
+                    <button disabled>&laquo; Anterior</button>
+                    <button class="active">1</button>
+                    <button>2</button>
+                    <button>3</button>
+                    <button>Siguiente &raquo;</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal de Producto -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Nuevo Producto</h3>
+                <button class="modal-close" onclick="closeProductModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <input type="hidden" id="productId">
+                    <div class="form-group">
+                        <label for="productName" class="form-label">Nombre *</label>
+                        <input type="text" id="productName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="productDescription" class="form-label">Descripción</label>
+                        <textarea id="productDescription" class="form-textarea" rows="3"></textarea>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label for="productCategory" class="form-label">Categoría *</label>
+                            <select id="productCategory" class="form-select" required>
+                                <option value="">Seleccionar categoría</option>
+                                <option value="Limpiadores">Limpiadores</option>
+                                <option value="Hidratantes">Hidratantes</option>
+                                <option value="Serums">Serums</option>
+                                <option value="Protectores">Protectores Solares</option>
+                                <option value="Mascarillas">Mascarillas</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="productPrice" class="form-label">Precio *</label>
+                            <input type="number" id="productPrice" class="form-input" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="productStock" class="form-label">Stock inicial *</label>
+                        <input type="number" id="productStock" class="form-input" min="0" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="closeProductModal()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="saveProduct()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+
+    <script>
+        // Funciones para el manejo de productos
+        function openProductModal(productId = null) {
+            const modal = document.getElementById('productModal');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('productForm');
+
+            if (productId) {
+                title.textContent = 'Editar Producto';
+                // Cargar datos del producto
+                loadProductData(productId);
+            } else {
+                title.textContent = 'Nuevo Producto';
+                form.reset();
+                document.getElementById('productId').value = '';
+            }
+
+            modal.classList.add('show');
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').classList.remove('show');
+        }
+
+        function saveProduct() {
+            const form = document.getElementById('productForm');
+            if (form.checkValidity()) {
+                // Aquí iría la lógica para guardar el producto
+                alert('Producto guardado correctamente');
+                closeProductModal();
+                // Recargar la tabla
+                location.reload();
+            } else {
+                alert('Por favor, completa todos los campos requeridos');
+            }
+        }
+
+        function editProduct(id) {
+            openProductModal(id);
+        }
+
+        function deleteProduct(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                // Aquí iría la lógica para eliminar el producto
+                alert('Producto eliminado correctamente');
+                location.reload();
+            }
+        }
+
+        function loadProductData(id) {
+            // Aquí iría la lógica para cargar los datos del producto
+            // Por ahora, datos de ejemplo
+            document.getElementById('productId').value = id;
+            document.getElementById('productName').value = 'Producto ' + id;
+            document.getElementById('productDescription').value = 'Descripción del producto ' + id;
+            document.getElementById('productCategory').value = 'Hidratantes';
+            document.getElementById('productPrice').value = '25.99';
+            document.getElementById('productStock').value = '15';
+        }
+
+        // Filtros
+        document.getElementById('searchInput').addEventListener('input', filterProducts);
+        document.getElementById('categoryFilter').addEventListener('change', filterProducts);
+        document.getElementById('stockFilter').addEventListener('change', filterProducts);
+
+        function filterProducts() {
+            // Aquí iría la lógica de filtrado
+            console.log('Aplicando filtros...');
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target === modal) {
+                closeProductModal();
+            }
+        });
+    </script>
+</body>
+</html>

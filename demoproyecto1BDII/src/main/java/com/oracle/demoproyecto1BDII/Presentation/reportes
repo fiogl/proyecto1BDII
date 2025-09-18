@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Reportes - Pink Hazze</title>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-1 p-6">
+        <div class="container">
+            <div class="max-w-4xl mx-auto">
+                <!-- Header -->
+                <div class="mb-6">
+                    <h1 class="text-3xl font-bold">Reportes</h1>
+                    <p style="color: var(--muted-foreground);">Analiza el rendimiento de tu negocio con reportes detallados</p>
+                </div>
+
+                <!-- Filtros generales -->
+                <div class="card mb-6">
+                    <div class="card-header">
+                        <h3 class="card-title">Filtros de Período</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="grid grid-cols-3 gap-4">
+                            <div>
+                                <label class="form-label">Fecha desde</label>
+                                <input type="date" id="globalFechaDesde" class="form-input">
+                            </div>
+                            <div>
+                                <label class="form-label">Fecha hasta</label>
+                                <input type="date" id="globalFechaHasta" class="form-input">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="applyGlobalFilters()" class="btn btn-primary">
+                                    <i data-lucide="filter" class="icon"></i>
+                                    Aplicar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs de reportes -->
+                <div class="mb-6">
+                    <div class="flex border-b" style="border-color: var(--border);">
+                        <button class="tab-button active" onclick="showTab('ventas-periodo')" id="tab-ventas-periodo">
+                            Ventas por Período
+                        </button>
+                        <button class="tab-button" onclick="showTab('ventas-cliente')" id="tab-ventas-cliente">
+                            Ventas por Cliente
+                        </button>
+                        <button class="tab-button" onclick="showTab('productos-vendidos')" id="tab-productos-vendidos">
+                            Productos Más Vendidos
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Reporte 1: Detalle de artículos vendidos en un período -->
+                <div id="report-ventas-periodo" class="report-section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Detalle de Artículos Vendidos por Período</h3>
+                            <p class="card-description">Reporte detallado con INNER JOIN de productos y ventas</p>
+                        </div>
+                        <div class="card-content">
+                            <!-- Filtros específicos -->
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="form-label">Producto específico</label>
+                                    <select id="productoFilter" class="form-select">
+                                        <option value="">Todos los productos</option>
+                                        <option value="1">Limpiador Facial Suave</option>
+                                        <option value="2">Crema Hidratante Anti-Edad</option>
+                                        <option value="3">Serum Vitamina C</option>
+                                        <option value="4">Protector Solar SPF 50</option>
+                                        <option value="5">Mascarilla Purificante</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button onclick="generateVentasPeriodoReport()" class="btn btn-secondary">
+                                        <i data-lucide="file-text" class="icon"></i>
+                                        Generar Reporte
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Tabla de resultados -->
+                            <div id="ventasPeriodoResults" class="hidden">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Fecha</th>
+                                            <th>Cliente</th>
+                                            <th>Producto</th>
+                                            <th>Categoría</th>
+                                            <th>Cantidad</th>
+                                            <th>Precio Unitario</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ventasPeriodoTableBody">
+                                        <!-- Los datos se cargarán aquí -->
+                                    </tbody>
+                                </table>
+
+                                <!-- Totales -->
+                                <div class="mt-4 p-4" style="background: var(--muted); border-radius: var(--radius);">
+                                    <div class="grid grid-cols-3 gap-4 text-center">
+                                        <div>
+                                            <div class="font-semibold">Total Productos</div>
+                                            <div class="text-lg" style="color: var(--primary);" id="totalProductos">0</div>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Total Cantidad</div>
+                                            <div class="text-lg" style="color: var(--primary);" id="totalCantidad">0</div>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Total Ventas</div>
+                                            <div class="text-lg" style="color: var(--primary);" id="totalVentas">$0.00</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reporte 2: Montos de ventas agrupados por cliente -->
+                <div id="report-ventas-cliente" class="report-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Montos de Ventas Agrupados por Cliente</h3>
+                            <p class="card-description">Reporte con LEFT JOIN para incluir todos los clientes</p>
+                        </div>
+                        <div class="card-content">
+                            <!-- Filtros específicos -->
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="form-label">Ordenar por</label>
+                                    <select id="ordenClienteFilter" class="form-select">
+                                        <option value="monto_desc">Mayor monto</option>
+                                        <option value="monto_asc">Menor monto</option>
+                                        <option value="nombre_asc">Nombre A-Z</option>
+                                        <option value="nombre_desc">Nombre Z-A</option>
+                                        <option value="fecha_desc">Más reciente</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button onclick="generateVentasClienteReport()" class="btn btn-secondary">
+                                        <i data-lucide="users" class="icon"></i>
+                                        Generar Reporte
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Resultados -->
+                            <div id="ventasClienteResults" class="hidden">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Cliente</th>
+                                            <th>Email</th>
+                                            <th>Número de Compras</th>
+                                            <th>Primera Compra</th>
+                                            <th>Última Compra</th>
+                                            <th>Total Gastado</th>
+                                            <th>Promedio por Compra</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ventasClienteTableBody">
+                                        <!-- Los datos se cargarán aquí -->
+                                    </tbody>
+                                </table>
+
+                                <!-- Estadísticas -->
+                                <div class="mt-4 p-4" style="background: var(--muted); border-radius: var(--radius);">
+                                    <div class="grid grid-cols-4 gap-4 text-center">
+                                        <div>
+                                            <div class="font-semibold">Total Clientes</div>
+                                            <div class="text-lg" style="color: var(--primary);" id="totalClientes">0</div>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Clientes Activos</div>
+                                            <div class="text-lg" style="color: var(--primary);" id="clientesActivos">0</div>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Ticket Promedio</div>
+                                            <div class="text-lg" style="color: var(--primary);" id="ticketPromedio">$0.00</div>
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold">Ingresos Totales</div>
+                                            <div class="text-lg" style="color: var(--primary);" id="ingresosTotales">$0.00</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reporte 3: Productos más vendidos -->
+                <div id="report-productos-vendidos" class="report-section hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Productos Más Vendidos</h3>
+                            <p class="card-description">Análisis de productos por cantidad y ingresos</p>
+                        </div>
+                        <div class="card-content">
+                            <!-- Filtros específicos -->
+                            <div class="grid grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="form-label">Categoría</label>
+                                    <select id="categoriaReporteFilter" class="form-select">
+                                        <option value="">Todas las categorías</option>
+                                        <option value="Limpiadores">Limpiadores</option>
+                                        <option value="Hidratantes">Hidratantes</option>
+                                        <option value="Serums">Serums</option>
+                                        <option value="Protectores">Protectores Solares</option>
+                                        <option value="Mascarillas">Mascarillas</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="form-label">Ordenar por</label>
+                                    <select id="ordenProductoFilter" class="form-select">
+                                        <option value="cantidad_desc">Más vendidos (cantidad)</option>
+                                        <option value="ingresos_desc">Mayores ingresos</option>
+                                        <option value="nombre_asc">Nombre A-Z</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button onclick="generateProductosVendidosReport()" class="btn btn-secondary">
+                                        <i data-lucide="trending-up" class="icon"></i>
+                                        Generar Reporte
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Resultados -->
+                            <div id="productosVendidosResults" class="hidden">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Ranking</th>
+                                            <th>Producto</th>
+                                            <th>Categoría</th>
+                                            <th>Cantidad Vendida</th>
+                                            <th>Ingresos Generados</th>
+                                            <th>Precio Promedio</th>
+                                            <th>% del Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productosVendidosTableBody">
+                                        <!-- Los datos se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de exportación -->
+                <div class="flex justify-end gap-4 mt-6">
+                    <button onclick="exportToPDF()" class="btn btn-outline">
+                        <i data-lucide="file-text" class="icon"></i>
+                        Exportar PDF
+                    </button>
+                    <button onclick="exportToExcel()" class="btn btn-outline">
+                        <i data-lucide="file-spreadsheet" class="icon"></i>
+                        Exportar Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
+
+    <script>
+        // Datos de ejemplo para los reportes
+        const sampleVentasPeriodo = [
+            { fecha: '2024-01-15', cliente: 'María García', producto: 'Crema Hidratante Anti-Edad', categoria: 'Hidratantes', cantidad: 2, precio: 35.50, subtotal: 71.00 },
+            { fecha: '2024-01-16', cliente: 'Ana López', producto: 'Serum Vitamina C', categoria: 'Serums', cantidad: 1, precio: 42.00, subtotal: 42.00 },
+            { fecha: '2024-01-17', cliente: 'Carmen Ruiz', producto: 'Limpiador Facial Suave', categoria: 'Limpiadores', cantidad: 3, precio: 25.99, subtotal: 77.97 }
+        ];
+
+        const sampleVentasCliente = [
+            { cliente: 'María García', email: 'maria@email.com', compras: 5, primera: '2024-01-15', ultima: '2024-01-28', total: 189.50, promedio: 37.90 },
+            { cliente: 'Ana López', email: 'ana@email.com', compras: 3, primera: '2024-01-16', ultima: '2024-01-25', total: 126.00, promedio: 42.00 },
+            { cliente: 'Carmen Ruiz', email: 'carmen@email.com', compras: 2, primera: '2024-01-17', ultima: '2024-01-20', total: 95.97, promedio: 47.99 }
+        ];
+
+        const sampleProductosVendidos = [
+            { ranking: 1, producto: 'Crema Hidratante Anti-Edad', categoria: 'Hidratantes', cantidad: 45, ingresos: 1597.50, promedio: 35.50, porcentaje: 28.5 },
+            { ranking: 2, producto: 'Serum Vitamina C', categoria: 'Serums', cantidad: 32, ingresos: 1344.00, promedio: 42.00, porcentaje: 24.0 },
+            { ranking: 3, producto: 'Limpiador Facial Suave', categoria: 'Limpiadores', cantidad: 38, ingresos: 987.62, promedio: 25.99, porcentaje: 17.6 }
+        ];
+
+        // Manejo de tabs
+        function showTab(tabName) {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.report-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Remover clase active de todos los botones
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+
+            // Mostrar la sección seleccionada
+            document.getElementById(`report-${tabName}`).classList.remove('hidden');
+
+            // Activar el botón seleccionado
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // Funciones para generar reportes
+        function generateVentasPeriodoReport() {
+            const resultsDiv = document.getElementById('ventasPeriodoResults');
+            const tableBody = document.getElementById('ventasPeriodoTableBody');
+
+            // Limpiar tabla
+            tableBody.innerHTML = '';
+
+            // Agregar datos de ejemplo
+            let totalProductos = 0;
+            let totalCantidad = 0;
+            let totalVentas = 0;
+
+            sampleVentasPeriodo.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${item.fecha}</td>
+                        <td>${item.cliente}</td>
+                        <td>${item.producto}</td>
+                        <td>${item.categoria}</td>
+                        <td>${item.cantidad}</td>
+                        <td>$${item.precio.toFixed(2)}</td>
+                        <td>$${item.subtotal.toFixed(2)}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+
+                totalProductos++;
+                totalCantidad += item.cantidad;
+                totalVentas += item.subtotal;
+            });
+
+            // Actualizar totales
+            document.getElementById('totalProductos').textContent = totalProductos;
+            document.getElementById('totalCantidad').textContent = totalCantidad;
+            document.getElementById('totalVentas').textContent = `$${totalVentas.toFixed(2)}`;
+
+            resultsDiv.classList.remove('hidden');
+        }
+
+        function generateVentasClienteReport() {
+            const resultsDiv = document.getElementById('ventasClienteResults');
+            const tableBody = document.getElementById('ventasClienteTableBody');
+
+            tableBody.innerHTML = '';
+
+            let totalClientes = 0;
+            let clientesActivos = 0;
+            let ingresosTotales = 0;
+            let totalCompras = 0;
+
+            sampleVentasCliente.forEach(item => {
+                const row = `
+                    <tr>
+                        <td>${item.cliente}</td>
+                        <td>${item.email}</td>
+                        <td>${item.compras}</td>
+                        <td>${item.primera}</td>
+                        <td>${item.ultima}</td>
+                        <td>$${item.total.toFixed(2)}</td>
+                        <td>$${item.promedio.toFixed(2)}</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+
+                totalClientes++;
+                if (item.compras > 0) clientesActivos++;
+                ingresosTotales += item.total;
+                totalCompras += item.compras;
+            });
+
+            const ticketPromedio = totalCompras > 0 ? ingresosTotales / totalCompras : 0;
+
+            document.getElementById('totalClientes').textContent = totalClientes;
+            document.getElementById('clientesActivos').textContent = clientesActivos;
+            document.getElementById('ticketPromedio').textContent = `$${ticketPromedio.toFixed(2)}`;
+            document.getElementById('ingresosTotales').textContent = `$${ingresosTotales.toFixed(2)}`;
+
+            resultsDiv.classList.remove('hidden');
+        }
+
+        function generateProductosVendidosReport() {
+            const resultsDiv = document.getElementById('productosVendidosResults');
+            const tableBody = document.getElementById('productosVendidosTableBody');
+
+            tableBody.innerHTML = '';
+
+            sampleProductosVendidos.forEach(item => {
+                const row = `
+                    <tr>
+                        <td><span class="font-bold" style="color: var(--primary);">#${item.ranking}</span></td>
+                        <td>${item.producto}</td>
+                        <td>${item.categoria}</td>
+                        <td>${item.cantidad}</td>
+                        <td>$${item.ingresos.toFixed(2)}</td>
+                        <td>$${item.promedio.toFixed(2)}</td>
+                        <td>${item.porcentaje}%</td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+
+            resultsDiv.classList.remove('hidden');
+        }
+
+        function applyGlobalFilters() {
+            const fechaDesde = document.getElementById('globalFechaDesde').value;
+            const fechaHasta = document.getElementById('globalFechaHasta').value;
+
+            console.log('Aplicando filtros globales:', { fechaDesde, fechaHasta });
+            alert('Filtros aplicados. Los reportes se actualizarán con el período seleccionado.');
+        }
+
+        function exportToPDF() {
+            alert('Exportando a PDF... (funcionalidad a implementar)');
+        }
+
+        function exportToExcel() {
+            alert('Exportando a Excel... (funcionalidad a implementar)');
+        }
+
+        // Establecer fechas por defecto (último mes)
+        document.addEventListener('DOMContentLoaded', function() {
+            const hoy = new Date();
+            const haceUnMes = new Date();
+            haceUnMes.setMonth(hoy.getMonth() - 1);
+
+            document.getElementById('globalFechaDesde').value = haceUnMes.toISOString().split('T')[0];
+            document.getElementById('globalFechaHasta').value = hoy.toISOString().split('T')[0];
+        });
+    </script>
+
+    <style>
+        .tab-button {
+            padding: 12px 24px;
+            border: none;
+            background: transparent;
+            color: var(--muted-foreground);
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-button:hover {
+            color: var(--foreground);
+        }
+
+        .tab-button.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .report-section {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</body>
+</html>
