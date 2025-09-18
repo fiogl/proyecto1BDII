@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Clientes - SkinCare Store</title>
+</head>
+
+<body>
+<!-- Navbar -->
+<nav th:replace="~{presentation/layout :: navbar}"></nav>
+
+<!-- Main Content -->
+<main class="main-content">
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-content">
+                <div class="header-text">
+                    <h1 class="page-title">
+                        <i class="fa-solid fa-users icon icon-lg"></i>
+                        Gestión de Clientes
+                    </h1>
+                    <p class="page-description">Administra la información de tus clientes</p>
+                </div>
+                <button class="btn btn-primary" onclick="openClientModal()">
+                    <i class="fa-solid fa-plus icon"></i>
+                    <span>Nuevo Cliente</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Search and Filters (puedes mantenerlos como adorno por ahora) -->
+        <div class="search-filters">
+            <div class="search-box">
+                <i class="fa-solid fa-search search-icon"></i>
+                <input type="text" id="searchClients" placeholder="Buscar clientes..." class="search-input">
+            </div>
+            <div class="filter-group">
+                <select id="filterStatus" class="select">
+                    <option value="">Todos los estados</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                </select>
+                <select id="filterCity" class="select">
+                    <option value="">Todas las ciudades</option>
+                    <option value="lima">Lima</option>
+                    <option value="arequipa">Arequipa</option>
+                    <option value="cusco">Cusco</option>
+                    <option value="trujillo">Trujillo</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Clients Table -->
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Teléfono</th>
+                    <th>Canton</th>
+                    <th>Provincia</th>
+                    <!-- <th>Estado</th>
+                    <th>Acciones</th> -->
+                </tr>
+                </thead>
+                <tbody>
+                <!-- Se llena desde el backend -->
+                <tr th:each="cliente : ${clientes}">
+                    <td><span class="badge badge-outline">#<span th:text="${cliente.id}"></span></span></td>
+                    <td>
+                        <div class="client-info">
+                            <div class="client-avatar">
+                                <i class="fa-solid fa-user icon"></i>
+                            </div>
+                            <div>
+                                <div class="font-medium" th:text="${cliente.nombre}"></div>
+                                <div class="text-sm text-muted" th:text="${cliente.codigo_mayorista} ?: 'Sin codigo mayorista'"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td th:text="${cliente.email}"></td>
+                    <td th:text="${cliente.telefono} ?: '-'"></td>
+                    <td>
+                        <div class="action-buttons">
+                            <!-- 🔹 Botón editar -->
+                            <a th:href="@{/cliente/edit/{id}(id=${cliente.id})}" class="btn btn-ghost btn-sm" title="Editar">
+                                <i class="fa-solid fa-pen-to-square icon"></i>
+                            </a>
+                            <!-- 🔹 Botón eliminar -->
+                            <form th:action="@{/cliente/delete/{id}(id=${cliente.id})}" method="post" style="display:inline;">
+                                <button class="btn btn-ghost btn-sm" title="Eliminar">
+                                    <i class="fa-solid fa-trash icon"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+<!-- Client Modal -->
+<div id="clientModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Nuevo Cliente</h3>
+            <button class="modal-close" onclick="closeClientModal()">
+                <i class="fa-solid fa-xmark icon"></i>
+            </button>
+        </div>
+
+        <!-- 🔹 Formulario  para registro de clientes -->
+        <form id="clientForm" th:action="@{/cliente}" th:object="${cliente}" method="post" class="modal-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Nombre *</label>
+                    <input type="text" th:field="*{nombre}" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Primer apellido *</label>
+                    <input type="text" th:field="*{p_Apellido}" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Segundo apellido *</label>
+                    <input type="text" th:field="*{s_Apellido}" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" th:field="*{email}" class="form-input" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Teléfono</label>
+                    <input type="tel" th:field="*{telefono}" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Codigo mayorista</label>
+                    <input type="text" th:field="*{codigo_mayorista}" class="form-input">
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <!-- Provincia -->
+                <div class="form-group">
+                    <label class="form-label">Provincia</label>
+                    <select id="provinciaSelect" class="form-input">
+                        <option value="">Seleccionar provincia</option>
+                        <option th:each="prov : ${provincias}"
+                                th:value="${prov.idProvincia}"
+                                th:text="${prov.nombre}">
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Cantón -->
+                <div class="form-group">
+                    <label class="form-label">Cantón</label>
+                    <select th:field="*{canton}" id="cantonSelect" class="form-input">
+                        <option value="">Seleccionar cantón</option>
+                        <!-- Se llenará dinámicamente -->
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Dirección</label>
+                <textarea th:field="*{direccion}" class="form-input" rows="3"></textarea>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-ghost" onclick="closeClientModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary">Guardar Cliente</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+
+<script>
+    function openClientModal() {
+        document.getElementById('clientModal').classList.add('active');
+    }
+    function closeClientModal() {
+        document.getElementById('clientModal').classList.remove('active');
+    }
+
+    document.getElementById('provinciaSelect').addEventListener('change', function() {
+        const provinciaId = this.value;
+        const cantonSelect = document.getElementById('cantonSelect');
+
+        // Vaciar select de cantones
+        cantonSelect.innerHTML = '<option value="">Seleccionar cantón</option>';
+
+        if (provinciaId) {
+            fetch(`/cliente/cantones?provinciaId=${provinciaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.forEach(canton => {
+                        const option = document.createElement('option');
+                        option.value = canton.idCanton;
+                        option.text = canton.nombre;
+                        cantonSelect.appendChild(option);
+                    });
+                });
+        }
+    });
+</script>
+</body>
+</html>

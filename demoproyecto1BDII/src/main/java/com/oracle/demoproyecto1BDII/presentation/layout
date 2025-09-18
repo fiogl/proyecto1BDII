@@ -46,7 +46,7 @@
                             <span>Productos</span>
                         </a>
 
-                        <a th:href="@{/clientes}"
+                        <a th:href="@{/com/oracle/demoproyecto1BDII/presentation/cliente}"
                            class="btn btn-ghost"
                            th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/clientes') ? 'active' : ''}">
                             <i data-lucide="users" class="icon"></i>

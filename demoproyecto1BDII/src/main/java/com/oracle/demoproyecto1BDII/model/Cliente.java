@@ -10,13 +10,17 @@ import lombok.Data;
 public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_Cliente;
+    private Long idCliente;
 
     private String nombre;
     private String p_Apellido;
     private String s_Apellido;
-    private String direccion;
+    private String direccion_exacta;
     private String email;
     private String telefono;
     private String codigo_mayorista;
+
+    @ManyToOne
+    @JoinColumn(name = "id_canton")
+    private Canton canton;
 }
