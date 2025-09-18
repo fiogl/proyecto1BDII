@@ -4,7 +4,7 @@
     <title>Inicio - Pink Hazze</title>
 </head>
 <body class="min-h-screen flex flex-col">
-    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+    <nav th:replace="~{presentation/layout :: navbar}"></nav>
 
     <main class="flex-1">
         <!-- Hero Section -->

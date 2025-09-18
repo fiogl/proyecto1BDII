@@ -46,6 +46,13 @@
                             <span>Productos</span>
                         </a>
 
+                        <a th:href="@{/clientes}"
+                           class="btn btn-ghost"
+                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/clientes') ? 'active' : ''}">
+                            <i data-lucide="users" class="icon"></i>
+                            <span>Clientes</span>
+                        </a>
+
                         <a th:href="@{/ventas}"
                            class="btn btn-ghost"
                            th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/ventas') ? 'active' : ''}">

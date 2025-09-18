@@ -1,4 +1,4 @@
-package com.oracle.demoproyecto1BDII.Logical;
+package com.oracle.demoproyecto1BDII.controller;
 
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
