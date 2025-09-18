@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle} + ' - Pink Hazze'">Pink Hazze</title>
+    <meta name="description" content="Sistema de gestión para tienda virtual de productos de cuidado de la piel">
+    <meta name="author" content="Pink Hazze">
+    <meta name="keywords" content="skincare, cuidado de la piel, gestión de tienda, e-commerce, productos de belleza">
+
+    <!-- Open Graph -->
+    <meta property="og:title" th:content="${pageTitle} + ' - Pink Hazze'">
+    <meta property="og:description" content="Sistema de gestión para tienda virtual de productos de cuidado de la piel">
+    <meta property="og:type" content="website">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Navbar Fragment -->
+    <nav th:fragment="navbar" class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <a th:href="@{/}" class="navbar-brand">
+                    <i class="fa-solid fa-heart icon icon-lg"></i>
+                    <span>Pink Hazze</span>
+                </a>
+
+                <div class="navbar-nav">
+                    <div class="navbar-links">
+                        <a th:href="@{/}"
+                           class="btn btn-ghost"
+                           th:classappend="${#httpServletRequest.requestURI == '/' ? 'active' : ''}">
+                            <i class="fa-solid fa-heart icon"></i>
+                            <span>Inicio</span>
+                        </a>
+
+                        <a th:href="@{/productos}"
+                           class="btn btn-ghost"
+                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/productos') ? 'active' : ''}">
+                            <i class="fa-solid fa-box-open icon"></i>
+                            <span>Productos</span>
+                        </a>
+
+                        <a th:href="@{/ventas}"
+                           class="btn btn-ghost"
+                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/ventas') ? 'active' : ''}">
+                            <i class="fa-solid fa-bag-shopping icon"></i>
+                            <span>Ventas</span>
+                        </a>
+
+                        <a th:href="@{/reportes}"
+                           class="btn btn-ghost"
+                           th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/reportes') ? 'active' : ''}">
+                            <i class="fa-solid fa-chart-column icon"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </div>
+
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-outline btn-sm">
+                            <i class="fa-solid fa-right-from-bracket icon"></i>
+                            <span>Cerrar sesión</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Footer Fragment -->
+    <footer th:fragment="footer" class="text-center p-6" style="margin-top: auto; background: var(--muted); color: var(--muted-foreground);">
+        <p>&copy; 2025 Pink Hazze. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
