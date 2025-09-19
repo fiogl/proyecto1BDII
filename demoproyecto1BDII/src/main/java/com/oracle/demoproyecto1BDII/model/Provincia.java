@@ -10,6 +10,7 @@ import java.util.List;
 public class Provincia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_provincia")
     private Long idProvincia;
 
     private String nombre;

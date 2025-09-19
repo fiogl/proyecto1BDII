@@ -18,10 +18,10 @@ public class DetallesUsuarioService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String nombreUsuario) throws UsernameNotFoundException {
-        var u = repo.findByNombre_usuario(nombreUsuario)
+        var u = repo.findUsuarioByNombreUsuario(nombreUsuario)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + nombreUsuario));
 
-        return User.withUsername(u.getNombre_usuario())
+        return User.withUsername(u.getNombreUsuario())
                 .password(u.getContrasenia_hash())
                 .roles("ADMIN")
                 .disabled(false)

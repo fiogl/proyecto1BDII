@@ -6,10 +6,11 @@ import java.util.List;
 
 @Entity
 @Data
-@Table(name = "cantón")
+@Table(name = "canton")
 public class Canton {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_canton")
     private Long idCanton;
 
     private String nombre;

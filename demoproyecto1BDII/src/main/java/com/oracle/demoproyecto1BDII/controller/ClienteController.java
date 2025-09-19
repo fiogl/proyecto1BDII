@@ -54,8 +54,8 @@ public class ClienteController {
 
     @GetMapping("/cantones")
     @ResponseBody
-    public List<Canton> obtenerCantones(@RequestParam Long provinciaId) {
-        return cantonService.listarPorProvincia(provinciaId);
+    public List<Canton> obtenerCantones(@RequestParam Long id_provincia) {
+        return cantonService.listarPorProvincia(id_provincia);
     }
 
     @PostMapping

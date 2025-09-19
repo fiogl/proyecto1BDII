@@ -8,7 +8,10 @@ import lombok.Data;
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_usuario;
-    private String nombre_usuario;
+    @Column(name = "id_usuario")
+    private Long idUsuario;
+
+    @Column(name = "nombre_usuario")
+    private String nombreUsuario;
     private String contrasenia_hash;
 }
