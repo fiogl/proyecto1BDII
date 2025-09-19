@@ -1,0 +1,9 @@
+package com.oracle.demoproyecto1BDII.tools;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+public class HasherContrasenia {
+    public static void main(String[] args) {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        System.out.println(bCryptPasswordEncoder.encode("admin"));
+    }
+}
