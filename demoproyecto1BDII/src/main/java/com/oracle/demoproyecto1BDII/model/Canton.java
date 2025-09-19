@@ -20,4 +20,6 @@ public class Canton {
 
     @OneToMany(mappedBy = "canton")
     private List<Cliente> clientes;
+
+    public Canton() {}
 }

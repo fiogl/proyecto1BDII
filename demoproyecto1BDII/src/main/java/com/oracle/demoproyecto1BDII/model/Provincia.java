@@ -16,4 +16,6 @@ public class Provincia {
 
     @OneToMany(mappedBy = "provincia")
     private List<Canton> cantones;
+
+    public Provincia() {}
 }

@@ -21,7 +21,7 @@
                 <p th:text="${error}">Error de autenticación</p>
             </div>
 
-            <form th:action="@{/login}" method="post" class="space-y-4">
+            <form th:action="@{/templates/login}" method="post" class="space-y-4">
                 <div class="form-group">
                     <label for="username" class="form-label">Usuario</label>
                     <input type="text"
