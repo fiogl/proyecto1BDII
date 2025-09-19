@@ -1,13 +1,14 @@
 package com.oracle.demoproyecto1BDII.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+@Controller
 public class LoginController {
     @GetMapping("/")
-    public String home(Model model) {
-
-        return "Login";  // Retorna la vista 'Login'
+    public String login() {
+        return "login";  // Retorna la vista 'login'
     }
 }
 
