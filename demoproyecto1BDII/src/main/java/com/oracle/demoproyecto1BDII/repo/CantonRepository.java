@@ -2,4 +2,8 @@ package com.oracle.demoproyecto1BDII.repo;
 import com.oracle.demoproyecto1BDII.model.Canton;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CantonRepository extends JpaRepository<Canton, Long> {}
+import java.util.List;
+
+public interface CantonRepository extends JpaRepository<Canton, Long> {
+    List<Canton> findByProvinciaId(Long provinciaId);
+}

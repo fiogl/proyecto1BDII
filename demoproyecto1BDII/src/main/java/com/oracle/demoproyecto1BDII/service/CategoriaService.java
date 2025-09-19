@@ -1,9 +1,7 @@
 package com.oracle.demoproyecto1BDII.service;
 
 import com.oracle.demoproyecto1BDII.model.Categoria;
-import com.oracle.demoproyecto1BDII.model.Producto;
 import com.oracle.demoproyecto1BDII.repo.CategoriaRepository;
-import com.oracle.demoproyecto1BDII.repo.ProductoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

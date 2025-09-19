@@ -28,68 +28,63 @@
             </div>
         </div>
 
-        <!-- Search and Filters (puedes mantenerlos como adorno por ahora) -->
-        <div class="search-filters">
-            <div class="search-box">
-                <i class="fa-solid fa-search search-icon"></i>
-                <input type="text" id="searchClients" placeholder="Buscar clientes..." class="search-input">
-            </div>
-            <div class="filter-group">
-                <select id="filterStatus" class="select">
-                    <option value="">Todos los estados</option>
-                    <option value="activo">Activo</option>
-                    <option value="inactivo">Inactivo</option>
-                </select>
-                <select id="filterCity" class="select">
-                    <option value="">Todas las ciudades</option>
-                    <option value="lima">Lima</option>
-                    <option value="arequipa">Arequipa</option>
-                    <option value="cusco">Cusco</option>
-                    <option value="trujillo">Trujillo</option>
-                </select>
-            </div>
-        </div>
-
         <!-- Clients Table -->
         <div class="table-container">
             <table class="table">
                 <thead>
                 <tr>
-                    <th>Nombre</th>
+                    <th>ID</th>
+                    <th>Cliente</th>
                     <th>Email</th>
                     <th>Teléfono</th>
-                    <th>Canton</th>
-                    <th>Provincia</th>
-                    <!-- <th>Estado</th>
-                    <th>Acciones</th> -->
+                    <th>Ubicación</th>
+                    <th>Acciones</th>
                 </tr>
                 </thead>
                 <tbody>
                 <!-- Se llena desde el backend -->
                 <tr th:each="cliente : ${clientes}">
-                    <td><span class="badge badge-outline">#<span th:text="${cliente.id}"></span></span></td>
+                    <td>
+                        <span class="badge badge-outline">#<span th:text="${cliente.idCliente}"></span></span>
+                    </td>
                     <td>
                         <div class="client-info">
                             <div class="client-avatar">
                                 <i class="fa-solid fa-user icon"></i>
                             </div>
                             <div>
-                                <div class="font-medium" th:text="${cliente.nombre}"></div>
-                                <div class="text-sm text-muted" th:text="${cliente.codigo_mayorista} ?: 'Sin codigo mayorista'"></div>
+                                <div class="font-medium">
+                                    <span th:text="${cliente.nombre}"></span>
+                                    <span th:text="${cliente.pApellido}"></span>
+                                    <span th:text="${cliente.sApellido}"></span>
+                                </div>
+                                <div class="text-sm text-muted"
+                                     th:text="${cliente.codigoMayorista != null && !cliente.codigoMayorista.isEmpty()} ? ${cliente.codigoMayorista} : 'Sin código mayorista'">
+                                </div>
                             </div>
                         </div>
                     </td>
                     <td th:text="${cliente.email}"></td>
-                    <td th:text="${cliente.telefono} ?: '-'"></td>
+                    <td th:text="${cliente.telefono != null && !cliente.telefono.isEmpty()} ? ${cliente.telefono} : '-'"></td>
+                    <td>
+                        <div th:if="${cliente.canton != null}">
+                            <div class="font-medium" th:text="${cliente.canton.nombre}"></div>
+                            <div class="text-sm text-muted" th:text="${cliente.canton.provincia.nombre}"></div>
+                        </div>
+                        <span th:unless="${cliente.canton != null}" class="text-muted">Sin ubicación</span>
+                    </td>
                     <td>
                         <div class="action-buttons">
-                            <!-- 🔹 Botón editar -->
-                            <a th:href="@{/cliente/edit/{id}(id=${cliente.id})}" class="btn btn-ghost btn-sm" title="Editar">
+                            <!-- Botón editar -->
+                            <a th:href="@{/cliente/edit/{id}(id=${cliente.idCliente})}"
+                               class="btn btn-ghost btn-sm" title="Editar">
                                 <i class="fa-solid fa-pen-to-square icon"></i>
                             </a>
-                            <!-- 🔹 Botón eliminar -->
-                            <form th:action="@{/cliente/delete/{id}(id=${cliente.id})}" method="post" style="display:inline;">
-                                <button class="btn btn-ghost btn-sm" title="Eliminar">
+                            <!-- Botón eliminar -->
+                            <form th:action="@{/cliente/delete/{id}(id=${cliente.idCliente})}"
+                                  method="post" style="display:inline;"
+                                  onsubmit="return confirm('¿Está seguro de eliminar este cliente?');">
+                                <button type="submit" class="btn btn-ghost btn-sm" title="Eliminar">
                                     <i class="fa-solid fa-trash icon"></i>
                                 </button>
                             </form>
@@ -112,7 +107,7 @@
             </button>
         </div>
 
-        <!-- 🔹 Formulario  para registro de clientes -->
+        <!-- Formulario para registro de clientes -->
         <form id="clientForm" th:action="@{/cliente}" th:object="${cliente}" method="post" class="modal-body">
             <div class="form-grid">
                 <div class="form-group">
@@ -122,12 +117,12 @@
 
                 <div class="form-group">
                     <label class="form-label">Primer apellido *</label>
-                    <input type="text" th:field="*{p_Apellido}" class="form-input" required>
+                    <input type="text" th:field="*{pApellido}" class="form-input" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Segundo apellido *</label>
-                    <input type="text" th:field="*{s_Apellido}" class="form-input" required>
+                    <input type="text" th:field="*{sApellido}" class="form-input" required>
                 </div>
 
                 <div class="form-group">
@@ -141,16 +136,15 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Codigo mayorista</label>
-                    <input type="text" th:field="*{codigo_mayorista}" class="form-input">
+                    <label class="form-label">Código mayorista</label>
+                    <input type="text" th:field="*{codigoMayorista}" class="form-input">
                 </div>
             </div>
 
             <div class="form-grid">
-                <!-- Provincia -->
                 <div class="form-group">
                     <label class="form-label">Provincia</label>
-                    <select id="provinciaSelect" class="form-input">
+                    <select th:field="*{canton.provincia.idProvincia}" id="provinciaSelect" class="form-input">
                         <option value="">Seleccionar provincia</option>
                         <option th:each="prov : ${provincias}"
                                 th:value="${prov.idProvincia}"
@@ -159,19 +153,18 @@
                     </select>
                 </div>
 
-                <!-- Cantón -->
                 <div class="form-group">
                     <label class="form-label">Cantón</label>
-                    <select th:field="*{canton}" id="cantonSelect" class="form-input">
+                    <select th:field="*{canton.idCanton}" id="cantonSelect" class="form-input">
                         <option value="">Seleccionar cantón</option>
-                        <!-- Se llenará dinámicamente -->
+                        <!-- Se llenará dinámicamente vía JS -->
                     </select>
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">Dirección</label>
-                <textarea th:field="*{direccion}" class="form-input" rows="3"></textarea>
+                <textarea th:field="*{direccionExacta}" class="form-input" rows="3"></textarea>
             </div>
 
             <div class="modal-footer">
@@ -188,7 +181,11 @@
 <script>
     function openClientModal() {
         document.getElementById('clientModal').classList.add('active');
+        // Limpiar formulario cuando se abre el modal
+        document.getElementById('clientForm').reset();
+        document.getElementById('cantonSelect').innerHTML = '<option value="">Seleccionar cantón</option>';
     }
+
     function closeClientModal() {
         document.getElementById('clientModal').classList.remove('active');
     }
@@ -202,7 +199,12 @@
 
         if (provinciaId) {
             fetch(`/cliente/cantones?provinciaId=${provinciaId}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al obtener cantones');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     data.forEach(canton => {
                         const option = document.createElement('option');
@@ -210,6 +212,9 @@
                         option.text = canton.nombre;
                         cantonSelect.appendChild(option);
                     });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
                 });
         }
     });

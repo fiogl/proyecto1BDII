@@ -39,28 +39,28 @@
                             <span>Inicio</span>
                         </a>
 
-                        <a th:href="@{/productos}"
+                        <a th:href="@{/templates/productos}"
                            class="btn btn-ghost"
                            th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/productos') ? 'active' : ''}">
                             <i class="fa-solid fa-box-open icon"></i>
                             <span>Productos</span>
                         </a>
 
-                        <a th:href="@{/com/oracle/demoproyecto1BDII/presentation/cliente}"
+                        <a th:href="@{/templates/cliente}"
                            class="btn btn-ghost"
                            th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/clientes') ? 'active' : ''}">
                             <i data-lucide="users" class="icon"></i>
                             <span>Clientes</span>
                         </a>
 
-                        <a th:href="@{/ventas}"
+                        <a th:href="@{/templates/ventas}"
                            class="btn btn-ghost"
                            th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/ventas') ? 'active' : ''}">
                             <i class="fa-solid fa-bag-shopping icon"></i>
                             <span>Ventas</span>
                         </a>
 
-                        <a th:href="@{/reportes}"
+                        <a th:href="@{/templates/reportes}"
                            class="btn btn-ghost"
                            th:classappend="${#strings.contains(#httpServletRequest.requestURI, '/reportes') ? 'active' : ''}">
                             <i class="fa-solid fa-chart-column icon"></i>
