@@ -6,7 +6,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/detalleVenta")
+@RequestMapping("/marca")
 public class MarcaController {
     private final MarcaService service;
 
