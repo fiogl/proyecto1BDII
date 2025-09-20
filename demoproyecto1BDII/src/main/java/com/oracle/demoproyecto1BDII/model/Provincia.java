@@ -8,16 +8,10 @@ import java.util.List;
 @Data
 @Table(name = "provincia")
 public class Provincia {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_provincia")
-    private Long idProvincia;
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id_provincia")
+    private Long id;
 
-    @Column
+    @Column(name="nombre", nullable=false, length=30)
     private String nombre;
-
-    @OneToMany(mappedBy = "provincia")
-    private List<Canton> cantones;
-
-    public Provincia() {}
 }

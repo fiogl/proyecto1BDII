@@ -18,5 +18,5 @@ public class CantonService {
     public Canton guardar(Canton c) { return repo.save(c); }
     public void eliminar(Long id) { repo.deleteById(id); }
     public Canton buscar(Long id) { return repo.findById(id).orElse(null); }
-    public List<Canton> listarPorProvincia(Long idProvincia) {return repo.findByProvinciaIdProvincia(idProvincia);}
+    public List<Canton> listarPorProvincia(Long idProvincia) { return repo.findByProvinciaId(idProvincia); }
 }

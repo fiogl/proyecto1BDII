@@ -6,14 +6,13 @@ import lombok.Data;
 @Data
 @Table(name = "usuario")
 public class Usuario {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_usuario")
-    private Long idUsuario;
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id_usuario")
+    private Long id;
 
-    @Column(name = "nombre_usuario")
+    @Column(name="nombre_usuario", nullable=false, length=300)
     private String nombreUsuario;
 
-    @Column(name = "contrasenia_hash")
+    @Column(name="contrasenia_hash", nullable=false, length=65)
     private String contraseniaHash;
 }

@@ -4,14 +4,12 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "categoría")
-
+@Table(name="categoria")
 public class Categoria {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_categoria")
-    private Long idCategoria;
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id_categoria")
+    private Long id;
 
-    @Column(name = "nombre")
+    @Column(name="nombre", nullable=false, length=30, unique=true)
     private String nombre;
 }

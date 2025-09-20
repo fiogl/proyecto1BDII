@@ -5,13 +5,11 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "marca")
-
 public class Marca {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_marca")
-    private Long id_marca;
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id_marca")
+    private Long id;
 
-    @Column
+    @Column(name="nombre", nullable=false, length=30, unique=true)
     private String nombre;
 }

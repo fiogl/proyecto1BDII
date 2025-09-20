@@ -8,19 +8,14 @@ import java.util.List;
 @Data
 @Table(name = "canton")
 public class Canton {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_canton")
-    private Long idCanton;
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id_canton")
+    private Long id;
 
+    @Column(name="nombre", nullable=false, length=30)
     private String nombre;
 
-    @ManyToOne
-    @JoinColumn(name = "id_provincia")
+    @ManyToOne(optional=false, fetch=FetchType.LAZY)
+    @JoinColumn(name="id_provincia", nullable=false)
     private Provincia provincia;
-
-    @OneToMany(mappedBy = "canton")
-    private List<Cliente> clientes;
-
-    public Canton() {}
 }

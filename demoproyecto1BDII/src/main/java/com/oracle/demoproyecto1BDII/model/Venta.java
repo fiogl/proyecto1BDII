@@ -2,23 +2,28 @@ package com.oracle.demoproyecto1BDII.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Data
 @Table(name = "venta")
 
 public class Venta {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_venta;
+    @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id_venta")
+    private Long id;
 
-    @Column
+    @ManyToOne(optional=false, fetch=FetchType.LAZY)
+    @JoinColumn(name="id_cliente", nullable=false)
+    private Cliente cliente;
+
+    @Column(name="fecha", nullable=false)
     private LocalDateTime fecha;
 
-    @Column
+    @Column(name="mensaje", length=1000)
     private String mensaje;
 
-    @ManyToOne
-    @JoinColumn(name = "id_cliente")
-    private Cliente cliente;
+    @OneToMany(mappedBy="venta", cascade=CascadeType.ALL, orphanRemoval=true)
+    private List<DetalleVenta> detalles = new ArrayList<>();
 }

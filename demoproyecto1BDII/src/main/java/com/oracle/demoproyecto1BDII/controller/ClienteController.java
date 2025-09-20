@@ -60,8 +60,8 @@ public class ClienteController {
 
     @PostMapping
     public String guardar(@ModelAttribute Cliente cliente) {
-        if (cliente.getCanton() != null && cliente.getCanton().getIdCanton() != null) {
-            Canton canton = cantonService.buscar(cliente.getCanton().getIdCanton());
+        if (cliente.getCanton() != null && cliente.getCanton().getId() != null) {
+            Canton canton = cantonService.buscar(cliente.getCanton().getId());
             cliente.setCanton(canton);
         }
 
