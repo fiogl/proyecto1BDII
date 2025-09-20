@@ -43,4 +43,9 @@ public class ProductoController {
         service.eliminar(id);
         return "redirect:/productos";
     }
+
+    @GetMapping("/")
+    public String producto() {
+        return "productos";
+    }
 }

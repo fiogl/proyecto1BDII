@@ -80,4 +80,9 @@ public class ClienteController {
         service.eliminar(id);
         return "redirect:/cliente";
     }
+
+    @GetMapping("/")
+    public String cliente() {
+        return "cliente";
+    }
 }
