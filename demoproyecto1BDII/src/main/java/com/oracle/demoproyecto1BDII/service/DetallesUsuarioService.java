@@ -1,6 +1,5 @@
 package com.oracle.demoproyecto1BDII.service;
 
-import com.oracle.demoproyecto1BDII.model.Usuario;
 import com.oracle.demoproyecto1BDII.repo.UsuarioRepository;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
