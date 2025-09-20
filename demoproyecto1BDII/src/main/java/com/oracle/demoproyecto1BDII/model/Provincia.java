@@ -13,6 +13,7 @@ public class Provincia {
     @Column(name = "id_provincia")
     private Long idProvincia;
 
+    @Column
     private String nombre;
 
     @OneToMany(mappedBy = "provincia")

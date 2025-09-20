@@ -13,5 +13,7 @@ public class Usuario {
 
     @Column(name = "nombre_usuario")
     private String nombreUsuario;
-    private String contrasenia_hash;
+
+    @Column(name = "contrasenia_hash")
+    private String contraseniaHash;
 }

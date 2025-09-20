@@ -9,7 +9,9 @@ import lombok.Data;
 public class Marca {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_marca")
     private Long id_marca;
 
+    @Column
     private String nombre;
 }

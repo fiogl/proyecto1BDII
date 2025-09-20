@@ -9,12 +9,20 @@ import lombok.Data;
 public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_producto;
+    @Column(name = "id_producto")
+    private Long idProducto;
 
+    @Column
     private String nombre;
+
+    @Column
     private Integer cantidad;
-    private Double porcentaje_mayor;
-    private Double precio_detalle;
+
+    @Column(name = "porcentajeMayor")
+    private Double porcentajeMayor;
+
+    @Column(name = "precio_detalle")
+    private Double precioDetalle;
 
     @ManyToOne
     @JoinColumn(name = "id_categoria")

@@ -12,7 +12,10 @@ public class Venta {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_venta;
 
+    @Column
     private LocalDateTime fecha;
+
+    @Column
     private String mensaje;
 
     @ManyToOne

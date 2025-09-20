@@ -21,7 +21,7 @@ public class DetallesUsuarioService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + nombreUsuario));
 
         return User.withUsername(u.getNombreUsuario())
-                .password(u.getContrasenia_hash())
+                .password(u.getContraseniaHash())
                 .roles("ADMIN")
                 .disabled(false)
                 .build();
