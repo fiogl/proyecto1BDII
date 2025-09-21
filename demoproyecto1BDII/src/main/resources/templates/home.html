@@ -40,7 +40,7 @@
                         <div class="stat-label">Ventas Hoy</div>
                     </div>
                     <div class="card stat-card">
-                        <div class="stat-number" th:text="'$' + ${ingresos ?: '0'}">$0</div>
+                        <div class="stat-number" th:text="'₡' + ${ingresos ?: '0'}">$0</div>
                         <div class="stat-label">Ingresos del Mes</div>
                     </div>
                 </div>
@@ -98,20 +98,6 @@
                             </div>
                         </div>
 
-                        <div class="card">
-                            <div class="card-content">
-                                <div class="flex items-center mb-4">
-                                    <i class="fa-solid fa-users icon icon-lg" style="color: var(--primary);"></i>
-                                    <h3 class="text-xl font-semibold ml-3">Clientes</h3>
-                                </div>
-                                <p class="text-sm mb-4" style="color: var(--muted-foreground);">
-                                    Gestiona la información de tus clientes
-                                </p>
-                                <a th:href="@{/cliente}" class="btn btn-outline">
-                                    Ir a Clientes
-                                </a>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>

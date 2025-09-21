@@ -21,37 +21,6 @@
                     </a>
                 </div>
 
-                <!-- Filtros -->
-                <div class="card mb-6">
-                    <div class="card-content">
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
-                                <label class="form-label">Buscar</label>
-                                <input type="text" id="searchInput" class="form-input" placeholder="Nombre del producto...">
-                            </div>
-                            <div>
-                                <label class="form-label">Categoría</label>
-                                <select id="categoryFilter" class="form-select">
-                                    <option value="">Todas las categorías</option>
-                                    <option th:each="categoria : ${categorias}" 
-                                            th:value="${categoria.nombre}" 
-                                            th:text="${categoria.nombre}">
-                                    </option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="form-label">Stock</label>
-                                <select id="stockFilter" class="form-select">
-                                    <option value="">Todos</option>
-                                    <option value="disponible">En stock</option>
-                                    <option value="bajo">Stock bajo (&lt;10)</option>
-                                    <option value="agotado">Agotado</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Tabla de productos -->
                 <div class="card">
                     <table class="table">

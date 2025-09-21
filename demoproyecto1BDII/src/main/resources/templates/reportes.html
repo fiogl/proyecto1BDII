@@ -12,55 +12,27 @@
                 <!-- Header -->
                 <div class="mb-6">
                     <h1 class="text-3xl font-bold">Reportes</h1>
-                    <p style="color: var(--muted-foreground);">Analiza el rendimiento de tu negocio con reportes detallados</p>
-                </div>
-
-                <!-- Filtros generales -->
-                <div class="card mb-6">
-                    <div class="card-header">
-                        <h3 class="card-title">Filtros de Período</h3>
-                    </div>
-                    <div class="card-content">
-                        <div class="grid grid-cols-3 gap-4">
-                            <div>
-                                <label class="form-label">Fecha desde</label>
-                                <input type="date" id="globalFechaDesde" class="form-input">
-                            </div>
-                            <div>
-                                <label class="form-label">Fecha hasta</label>
-                                <input type="date" id="globalFechaHasta" class="form-input">
-                            </div>
-                            <div class="flex items-end">
-                                <button onclick="applyGlobalFilters()" class="btn btn-primary">
-                                    <i data-lucide="filter" class="icon"></i>
-                                    Aplicar Filtros
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                    <p style="color: var(--muted-foreground);">Análisis del rendimiento de la tienda</p>
                 </div>
 
                 <!-- Tabs de reportes -->
                 <div class="mb-6">
                     <div class="flex border-b" style="border-color: var(--border);">
                         <button class="tab-button active" onclick="showTab('ventas-periodo')" id="tab-ventas-periodo">
-                            Ventas por Período
+                            Ventas por marca
                         </button>
                         <button class="tab-button" onclick="showTab('ventas-cliente')" id="tab-ventas-cliente">
                             Ventas por Cliente
                         </button>
-                        <button class="tab-button" onclick="showTab('productos-vendidos')" id="tab-productos-vendidos">
-                            Productos Más Vendidos
-                        </button>
                     </div>
                 </div>
 
-                <!-- Reporte 1: Detalle de artículos vendidos en un período -->
+                <!-- Reporte 1: Detalle de artículos vendidos por marca (Inner Join)-->
                 <div id="report-ventas-periodo" class="report-section">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Detalle de Artículos Vendidos por Período</h3>
-                            <p class="card-description">Reporte detallado con INNER JOIN de productos y ventas</p>
+                            <h3 class="card-title">Artículos vendidos por marca</h3>
+                            <p class="card-description">Top marcas de la tienda:</p>
                         </div>
                         <div class="card-content">
                             <!-- Filtros específicos -->
@@ -125,12 +97,12 @@
                     </div>
                 </div>
 
-                <!-- Reporte 2: Montos de ventas agrupados por cliente -->
+                <!-- Reporte 2: Montos de ventas agrupados por cliente (Left Join)-->
                 <div id="report-ventas-cliente" class="report-section hidden">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Montos de Ventas Agrupados por Cliente</h3>
-                            <p class="card-description">Reporte con LEFT JOIN para incluir todos los clientes</p>
+                            <h3 class="card-title">Ventas por Cliente</h3>
+                            <p class="card-description">Aquí puedes ver los clientes más estelares:</p>
                         </div>
                         <div class="card-content">
                             <!-- Filtros específicos -->
@@ -198,77 +170,6 @@
                     </div>
                 </div>
 
-                <!-- Reporte 3: Productos más vendidos -->
-                <div id="report-productos-vendidos" class="report-section hidden">
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">Productos Más Vendidos</h3>
-                            <p class="card-description">Análisis de productos por cantidad y ingresos</p>
-                        </div>
-                        <div class="card-content">
-                            <!-- Filtros específicos -->
-                            <div class="grid grid-cols-3 gap-4 mb-4">
-                                <div>
-                                    <label class="form-label">Categoría</label>
-                                    <select id="categoriaReporteFilter" class="form-select">
-                                        <option value="">Todas las categorías</option>
-                                        <option value="Limpiadores">Limpiadores</option>
-                                        <option value="Hidratantes">Hidratantes</option>
-                                        <option value="Serums">Serums</option>
-                                        <option value="Protectores">Protectores Solares</option>
-                                        <option value="Mascarillas">Mascarillas</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="form-label">Ordenar por</label>
-                                    <select id="ordenProductoFilter" class="form-select">
-                                        <option value="cantidad_desc">Más vendidos (cantidad)</option>
-                                        <option value="ingresos_desc">Mayores ingresos</option>
-                                        <option value="nombre_asc">Nombre A-Z</option>
-                                    </select>
-                                </div>
-                                <div class="flex items-end">
-                                    <button onclick="generateProductosVendidosReport()" class="btn btn-secondary">
-                                        <i data-lucide="trending-up" class="icon"></i>
-                                        Generar Reporte
-                                    </button>
-                                </div>
-                            </div>
-
-                            <!-- Resultados -->
-                            <div id="productosVendidosResults" class="hidden">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Ranking</th>
-                                            <th>Producto</th>
-                                            <th>Categoría</th>
-                                            <th>Cantidad Vendida</th>
-                                            <th>Ingresos Generados</th>
-                                            <th>Precio Promedio</th>
-                                            <th>% del Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="productosVendidosTableBody">
-                                        <!-- Los datos se cargarán aquí -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Botones de exportación -->
-                <div class="flex justify-end gap-4 mt-6">
-                    <button onclick="exportToPDF()" class="btn btn-outline">
-                        <i data-lucide="file-text" class="icon"></i>
-                        Exportar PDF
-                    </button>
-                    <button onclick="exportToExcel()" class="btn btn-outline">
-                        <i data-lucide="file-spreadsheet" class="icon"></i>
-                        Exportar Excel
-                    </button>
-                </div>
             </div>
         </div>
     </main>
@@ -417,22 +318,6 @@
             });
 
             resultsDiv.classList.remove('hidden');
-        }
-
-        function applyGlobalFilters() {
-            const fechaDesde = document.getElementById('globalFechaDesde').value;
-            const fechaHasta = document.getElementById('globalFechaHasta').value;
-
-            console.log('Aplicando filtros globales:', { fechaDesde, fechaHasta });
-            alert('Filtros aplicados. Los reportes se actualizarán con el período seleccionado.');
-        }
-
-        function exportToPDF() {
-            alert('Exportando a PDF... (funcionalidad a implementar)');
-        }
-
-        function exportToExcel() {
-            alert('Exportando a Excel... (funcionalidad a implementar)');
         }
 
         // Establecer fechas por defecto (último mes)
