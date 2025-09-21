@@ -1,4 +1,4 @@
-package com.oracle.demoproyecto1BDII.model;
+package com.oracle.demoproyecto1BDII.DTOs;
 
 import java.math.BigDecimal;
 

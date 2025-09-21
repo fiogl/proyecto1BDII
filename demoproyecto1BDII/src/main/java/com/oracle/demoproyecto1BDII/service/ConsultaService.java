@@ -1,7 +1,7 @@
 package com.oracle.demoproyecto1BDII.service;
 
-import com.oracle.demoproyecto1BDII.model.MarcaVentaDTO;
-import com.oracle.demoproyecto1BDII.model.VentaClienteDTO;
+import com.oracle.demoproyecto1BDII.DTOs.MarcaVentaDTO;
+import com.oracle.demoproyecto1BDII.DTOs.VentaClienteDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Service;
@@ -18,22 +18,18 @@ public class ConsultaService {
     }
 
     public List<MarcaVentaDTO> getMarcasMasVendidas() {
-        String sql = """
-            SELECT m.nombre AS marca,
-                   SUM(d.cantidad * d.precio_venta_unidad) AS total_vendido
-            FROM detalle_venta d
-            INNER JOIN producto p ON p.id_producto = d.id_producto
-            INNER JOIN marca m ON m.id_marca = p.id_marca
-            GROUP BY m.nombre,d.cantidad,d.precio_venta_unidad
-            ORDER BY total_vendido DESC
-        """;
+        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
+                .withCatalogName("pk_consultas")
+                .withProcedureName("pr_marcas_mas_vendidas")
+                .returningResultSet("m_cursor", (rs, rowNum) ->
+                        new MarcaVentaDTO(
+                                rs.getString("MARCA"),
+                                rs.getInt("TOTAL_VENDIDO"),
+                                rs.getBigDecimal("TOTAL_RECAUDADO")
+                        )
+                );
 
-        return jdbcTemplate.query(sql, (rs, rowNum) ->
-                new MarcaVentaDTO(
-                        rs.getString("marca"),
-                        rs.getInt("total_vendido")
-                )
-        );
+        return (List<MarcaVentaDTO>) jdbcCall.execute().get("m_cursor");
     }
 
     public List<VentaClienteDTO> getVentasPorCliente() {
@@ -42,10 +38,10 @@ public class ConsultaService {
                 .withFunctionName("ventas_por_cliente") // función
                 .returningResultSet("RETURN_VALUE", (rs, rowNum) ->
                         new VentaClienteDTO(
-                                rs.getLong("id_cliente"),
-                                rs.getString("cliente"),
-                                rs.getInt("items_comprados"),
-                                rs.getBigDecimal("total_ventas")
+                                rs.getLong("ID_CLIENTE"),
+                                rs.getString("CLIENTE"),
+                                rs.getInt("TOTAL_VENTAS"),
+                                rs.getBigDecimal("MONTO_TOTAL")
                         )
                 );
 

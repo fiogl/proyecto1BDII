@@ -36,34 +36,41 @@
                                 <h3 class="card-title">Artículos vendidos por marca</h3>
                                 <p class="card-description">Top marcas de la tienda:</p>
                             </div>
-                            <div class="card-content">
+                            <div class="card-content ">
                                 <!-- Tabla de resultados -->
                                 <div id="ventasPeriodoResults">
-                                    <table class="table">
+                                    <table class="table text-center">
                                         <thead>
                                         <tr>
                                             <th>Marca</th>
-                                            <th>Total Vendido</th>
+                                            <th>Total vendido</th>
+                                            <th>Ganancia total</th>
                                         </tr>
                                         </thead>
                                         <tbody id="ventasPeriodoTableBody">
                                         <tr th:each="item : ${marcas}">
                                             <td th:text="${item.marca}">Marca</td>
-                                            <td th:text="${'₡' + item.totalVendido}">0</td>
+                                            <td th:text="${item.totalVendido}">0</td>
+                                            <td th:text="${'₡' + item.totalRecaudado}">0</td>
                                         </tr>
                                         </tbody>
                                     </table>
                                     <!-- Totales -->
                                     <div class="mt-4 p-4" style="background: var(--muted); border-radius: var(--radius);">
-                                        <div class="grid grid-cols-2 gap-4 text-center">
+                                        <div class="grid grid-cols-3 gap-1 text-center">
                                             <div>
-                                                <div class="font-semibold">Total Marcas</div>
+                                                <div class="font-semibold">Total marcas</div>
                                                 <div class="text-lg" style="color: var(--primary);" th:text="${marcas.size()}">0</div>
                                             </div>
                                             <div>
-                                                <div class="font-semibold">Total Vendido</div>
+                                                <div class="font-semibold">Ventas totales</div>
                                                 <div class="text-lg" style="color: var(--primary);"
-                                                th:text="${'₡' + totalVendidoMarcas}">$0</div>
+                                                th:text="${totalVendidoMarcas}">0</div>
+                                            </div>
+                                            <div>
+                                                <div class="font-semibold">Ganancia general</div>
+                                                <div class="text-lg" style="color: var(--primary);"
+                                                     th:text="${'₡' +totalVendidoGeneral}">₡0</div>
                                             </div>
                                         </div>
                                     </div>
@@ -83,7 +90,7 @@
                                     <thead>
                                     <tr>
                                         <th>Cliente</th>
-                                        <th>Items comprados</th>
+                                        <th>Compras realizadas</th>
                                         <th>Total de compra</th>
                                     </tr>
                                     </thead>

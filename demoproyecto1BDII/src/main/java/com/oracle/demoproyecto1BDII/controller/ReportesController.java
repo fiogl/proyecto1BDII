@@ -1,7 +1,7 @@
 package com.oracle.demoproyecto1BDII.controller;
 
-import com.oracle.demoproyecto1BDII.model.MarcaVentaDTO;
-import com.oracle.demoproyecto1BDII.model.VentaClienteDTO;
+import com.oracle.demoproyecto1BDII.DTOs.MarcaVentaDTO;
+import com.oracle.demoproyecto1BDII.DTOs.VentaClienteDTO;
 import com.oracle.demoproyecto1BDII.service.ConsultaService;
 import com.oracle.demoproyecto1BDII.service.ProductoService;
 import com.oracle.demoproyecto1BDII.service.VentaService;
@@ -43,9 +43,20 @@ public class ReportesController {
                 .mapToInt(MarcaVentaDTO::getTotalVendido)
                 .sum();
 
+        BigDecimal totalRecaudadoMarcas = marcas.stream()
+                .map(MarcaVentaDTO::getTotalRecaudado)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        model.addAttribute("totalRecaudadoMarcas", totalRecaudadoMarcas);
+
+        BigDecimal totalRecaudado = marcas.stream()
+                .map(MarcaVentaDTO::getTotalRecaudado)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         BigDecimal totalVentasClientes = ventasClientes.stream()
                 .map(VentaClienteDTO::getTotalVendido) // BigDecimal
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("totalVendidoGeneral", totalRecaudado);
 
         int totalItemsComprados = ventasClientes.stream()
                 .mapToInt(VentaClienteDTO::getItemsComprados)
@@ -56,11 +67,6 @@ public class ReportesController {
         model.addAttribute("totalVendidoMarcas", totalVendidoMarcas);
         model.addAttribute("ventasClientes", ventasClientes);
         model.addAttribute("itemsComprados", totalItemsComprados);
-
-        // Placeholder para estadísticas más complejas
-        model.addAttribute("ventasHoy", 0);
-        model.addAttribute("ingresosDia", 0);
-        model.addAttribute("ingresosMes", 0);
 
         return "reportes";
     }
