@@ -13,28 +13,12 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h1 class="text-3xl font-bold">Gestión de Ventas</h1>
-                        <p style="color: var(--muted-foreground);">Registra y administra las ventas de tu tienda</p>
+                        <p style="color: var(--muted-foreground);">Registra y administra las ventas</p>
                     </div>
                     <a th:href="@{/ventas/nuevo}" class="btn btn-primary">
                         <i class="fa-solid fa-plus icon"></i>
                         Nueva Venta
                     </a>
-                </div>
-
-                <!-- Resumen de ventas -->
-                <div class="grid grid-cols-3 gap-4 mb-6">
-                    <div class="card stat-card">
-                        <div class="stat-number" th:text="${ventasHoy ?: '0'}">0</div>
-                        <div class="stat-label">Ventas Hoy</div>
-                    </div>
-                    <div class="card stat-card">
-                        <div class="stat-number" th:text="'₡' + ${ingresosDia ?: '0'}">$0</div>
-                        <div class="stat-label">Ingresos del Día</div>
-                    </div>
-                    <div class="card stat-card">
-                        <div class="stat-number" th:text="'₡' + ${ingresosMes ?: '0'}">$0</div>
-                        <div class="stat-label">Ingresos del Mes</div>
-                    </div>
                 </div>
 
                 <!-- Tabla de ventas -->

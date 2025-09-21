@@ -21,11 +21,13 @@ public class VentaController {
     private final ProductoService productoService;
     private final DetalleVentaService detalleVentaService;
 
+
     public VentaController(VentaService service, ClienteService clienteService, ProductoService productoService, DetalleVentaService detalleVentaService) {
         this.service = service;
         this.clienteService = clienteService;
         this.productoService = productoService;
         this.detalleVentaService = detalleVentaService;
+
     }
 
     @GetMapping
@@ -193,5 +195,6 @@ public class VentaController {
         }
         return "redirect:/ventas";
     }
+
 }
 

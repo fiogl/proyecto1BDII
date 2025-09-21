@@ -12,7 +12,7 @@
             <div class="container">
                 <h1 class="hero-title">Pink Hazze</h1>
                 <p class="hero-description">
-                    Sistema de gestión integral para tu tienda de productos de cuidado de la piel
+                    Sistema de gestión para la mejor tienda de productos de cuidado de la piel ✨
                 </p>
                 <div class="space-x-4">
                     <a th:href="@{/productos}" class="btn btn-secondary">
@@ -30,18 +30,10 @@
         <!-- Stats Section -->
         <section class="stats">
             <div class="container">
-                <div class="grid grid-cols-3 gap-6">
+                <div class="grid grid-cols-1 gap-6">
                     <div class="card stat-card">
                         <div class="stat-number" th:text="${totalProductos ?: '0'}">0</div>
                         <div class="stat-label">Productos Activos</div>
-                    </div>
-                    <div class="card stat-card">
-                        <div class="stat-number" th:text="${ventasHoy ?: '0'}">0</div>
-                        <div class="stat-label">Ventas Hoy</div>
-                    </div>
-                    <div class="card stat-card">
-                        <div class="stat-number" th:text="'₡' + ${ingresos ?: '0'}">$0</div>
-                        <div class="stat-label">Ingresos del Mes</div>
                     </div>
                 </div>
             </div>
@@ -75,7 +67,7 @@
                                     <h3 class="text-xl font-semibold ml-3">Control de Ventas</h3>
                                 </div>
                                 <p class="text-sm mb-4" style="color: var(--muted-foreground);">
-                                    Registra y gestiona las ventas de tu tienda
+                                    Registra y administra las ventas
                                 </p>
                                 <a th:href="@{/ventas}" class="btn btn-primary">
                                     Ir a Ventas
@@ -90,7 +82,7 @@
                                     <h3 class="text-xl font-semibold ml-3">Reportes</h3>
                                 </div>
                                 <p class="text-sm mb-4" style="color: var(--muted-foreground);">
-                                    Analiza el rendimiento de tu negocio
+                                    Análisis del rendimiento de la tienda
                                 </p>
                                 <a th:href="@{/reportes}" class="btn btn-primary">
                                     Ver Reportes
