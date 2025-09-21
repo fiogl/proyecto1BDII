@@ -4,7 +4,7 @@
     <title>Productos - Pink Hazze</title>
 </head>
 <body class="min-h-screen flex flex-col">
-    <nav th:replace="~{presentation/layout :: navbar}"></nav>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
     <main class="flex-1 p-6">
         <div class="container">
@@ -15,10 +15,10 @@
                         <h1 class="text-3xl font-bold">Gestión de Productos</h1>
                         <p style="color: var(--muted-foreground);">Administra tu catálogo de productos de cuidado de la piel</p>
                     </div>
-                    <button onclick="openProductModal()" class="btn btn-primary">
+                    <a th:href="@{/productos/nuevo}" class="btn btn-primary">
                         <i class="fa-solid fa-plus icon"></i>
                         Nuevo Producto
-                    </button>
+                    </a>
                 </div>
 
                 <!-- Filtros -->
@@ -60,8 +60,9 @@
                             <tr>
                                 <th>Nombre</th>
                                 <th>Categoría</th>
-                                <th>Precio</th>
-                                <th>Stock</th>
+                                <th>Marca</th>
+                                <th>Precio Detalle</th>
+                                <th>Cantidad</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -72,40 +73,40 @@
                                 <td>
                                     <div>
                                         <div class="font-semibold" th:text="${producto.nombre}">Producto</div>
-                                        <div class="text-sm" style="color: var(--muted-foreground);" th:text="${producto.descripcion}">Descripción</div>
                                     </div>
                                 </td>
-                                <td th:text="${producto.categoria}">Categoría</td>
-                                <td th:text="'$' + ${producto.precio}">$0.00</td>
+                                <td th:text="${producto.categoria.nombre}">Categoría</td>
+                                <td th:text="${producto.marca.nombre}">Marca</td>
+                                <td th:text="'$' + ${producto.precioDetalle}">$0.00</td>
                                 <td>
                                     <span class="px-2 py-1 rounded text-sm"
-                                          th:classappend="${producto.stock > 10 ? 'bg-green-100 text-green-800' : producto.stock > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}"
-                                          th:text="${producto.stock}">0</span>
+                                          th:classappend="${producto.cantidad > 10 ? 'bg-green-100 text-green-800' : producto.cantidad > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}"
+                                          th:text="${producto.cantidad}">0</span>
                                 </td>
                                 <td>
                                     <span class="px-2 py-1 rounded text-sm"
-                                          th:classappend="${producto.stock > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
-                                          th:text="${producto.stock > 0 ? 'Disponible' : 'Agotado'}">Estado</span>
+                                          th:classappend="${producto.cantidad > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}"
+                                          th:text="${producto.cantidad > 0 ? 'Disponible' : 'Agotado'}">Estado</span>
                                 </td>
                                 <td>
                                     <div class="flex gap-2">
-                                        <button th:onclick="'editProduct(' + ${producto.id} + ')'" class="btn btn-outline btn-sm">
+                                        <a th:href="@{'/productos/editar/' + ${producto.id}}" class="btn btn-outline btn-sm">
                                             <i class="fa-solid fa-pen-to-square icon"></i>
-                                        </button>
-                                        <button th:onclick="'deleteProduct(' + ${producto.id} + ')'" class="btn btn-outline btn-sm" style="color: #dc2626;">
+                                        </a>
+                                        <a th:href="@{'/productos/eliminar/' + ${producto.id}}" class="btn btn-outline btn-sm" style="color: #dc2626;" onclick="return confirm('¿Eliminar producto?');">
                                             <i class="fa-solid fa-trash icon"></i>
-                                        </button>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
 
                             <!-- Productos de ejemplo si no hay datos -->
                             <tr th:if="${productos == null or productos.empty}">
-                                <td colspan="6" class="text-center p-6" style="color: var(--muted-foreground);">
+                                <td colspan="7" class="text-center p-6" style="color: var(--muted-foreground);">
                                     No hay productos registrados.
-                                    <button onclick="openProductModal()" class="btn btn-primary btn-sm mt-2">
+                                    <a th:href="@{/productos/nuevo}" class="btn btn-primary btn-sm mt-2">
                                         Agregar el primero
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
                         </tbody>
@@ -124,134 +125,6 @@
         </div>
     </main>
 
-    <!-- Modal de Producto -->
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Nuevo Producto</h3>
-                <button class="modal-close" onclick="closeProductModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="productForm">
-                    <input type="hidden" id="productId">
-                    <div class="form-group">
-                        <label for="productName" class="form-label">Nombre *</label>
-                        <input type="text" id="productName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="productDescription" class="form-label">Descripción</label>
-                        <textarea id="productDescription" class="form-textarea" rows="3"></textarea>
-                    </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="form-group">
-                            <label for="productCategory" class="form-label">Categoría *</label>
-                            <select id="productCategory" class="form-select" required>
-                                <option value="">Seleccionar categoría</option>
-                                <option value="Limpiadores">Limpiadores</option>
-                                <option value="Hidratantes">Hidratantes</option>
-                                <option value="Serums">Serums</option>
-                                <option value="Protectores">Protectores Solares</option>
-                                <option value="Mascarillas">Mascarillas</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="productPrice" class="form-label">Precio *</label>
-                            <input type="number" id="productPrice" class="form-input" step="0.01" min="0" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="productStock" class="form-label">Stock inicial *</label>
-                        <input type="number" id="productStock" class="form-input" min="0" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeProductModal()">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveProduct()">Guardar</button>
-            </div>
-        </div>
-    </div>
-
     <footer th:replace="~{fragments/layout :: footer}"></footer>
-    <div th:replace="~{fragments/layout :: scripts}"></div>
-
-    <script>
-        // Funciones para el manejo de productos
-        function openProductModal(productId = null) {
-            const modal = document.getElementById('productModal');
-            const title = document.getElementById('modalTitle');
-            const form = document.getElementById('productForm');
-
-            if (productId) {
-                title.textContent = 'Editar Producto';
-                // Cargar datos del producto
-                loadProductData(productId);
-            } else {
-                title.textContent = 'Nuevo Producto';
-                form.reset();
-                document.getElementById('productId').value = '';
-            }
-
-            modal.classList.add('show');
-        }
-
-        function closeProductModal() {
-            document.getElementById('productModal').classList.remove('show');
-        }
-
-        function saveProduct() {
-            const form = document.getElementById('productForm');
-            if (form.checkValidity()) {
-                // Aquí iría la lógica para guardar el producto
-                alert('Producto guardado correctamente');
-                closeProductModal();
-                // Recargar la tabla
-                location.reload();
-            } else {
-                alert('Por favor, completa todos los campos requeridos');
-            }
-        }
-
-        function editProduct(id) {
-            openProductModal(id);
-        }
-
-        function deleteProduct(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar este producto?')) {
-                // Aquí iría la lógica para eliminar el producto
-                alert('Producto eliminado correctamente');
-                location.reload();
-            }
-        }
-
-        function loadProductData(id) {
-            // Aquí iría la lógica para cargar los datos del producto
-            // Por ahora, datos de ejemplo
-            document.getElementById('productId').value = id;
-            document.getElementById('productName').value = 'Producto ' + id;
-            document.getElementById('productDescription').value = 'Descripción del producto ' + id;
-            document.getElementById('productCategory').value = 'Hidratantes';
-            document.getElementById('productPrice').value = '25.99';
-            document.getElementById('productStock').value = '15';
-        }
-
-        // Filtros
-        document.getElementById('searchInput').addEventListener('input', filterProducts);
-        document.getElementById('categoryFilter').addEventListener('change', filterProducts);
-        document.getElementById('stockFilter').addEventListener('change', filterProducts);
-
-        function filterProducts() {
-            // Aquí iría la lógica de filtrado
-            console.log('Aplicando filtros...');
-        }
-
-        // Cerrar modal al hacer clic fuera
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('productModal');
-            if (event.target === modal) {
-                closeProductModal();
-            }
-        });
-    </script>
 </body>
 </html>

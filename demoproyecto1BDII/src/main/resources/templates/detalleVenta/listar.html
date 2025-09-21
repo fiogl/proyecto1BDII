@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title>Detalles de Venta - Pink Hazze</title>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-1 p-6">
+        <div class="container max-w-6xl mx-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <h1 class="text-3xl font-bold">Detalles de Venta</h1>
+                    <p style="color: var(--muted-foreground);">Administra los detalles de las ventas</p>
+                </div>
+                <a th:href="@{/detalleVenta/nuevo}" class="btn btn-primary">
+                    <i class="fa-solid fa-plus icon"></i>
+                    Nuevo Detalle
+                </a>
+            </div>
+
+            <!-- Tabla -->
+            <div class="card">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Venta</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Subtotal</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="detalle : ${detalleVentas}">
+                            <td>
+                                <div>
+                                    <div class="font-semibold">Venta #<span th:text="${detalle.venta.id}"></span></div>
+                                    <div class="text-sm" style="color: var(--muted-foreground);" th:text="${#dates.format(detalle.venta.fecha, 'dd/MM/yyyy HH:mm')}"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <div>
+                                    <div class="font-semibold" th:text="${detalle.producto.nombre}"></div>
+                                    <div class="text-sm" style="color: var(--muted-foreground);" th:text="${detalle.producto.categoria.nombre}"></div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="px-2 py-1 rounded text-sm bg-blue-100 text-blue-800" th:text="${detalle.cantidad}"></span>
+                            </td>
+                            <td th:text="'$' + ${detalle.precioVentaUnidad}">$0.00</td>
+                            <td>
+                                <div class="font-semibold" th:text="'$' + ${#numbers.formatDecimal(detalle.cantidad * detalle.precioVentaUnidad, 1, 2)}">$0.00</div>
+                            </td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <a th:href="@{'/detalleVenta/editar/' + ${detalle.venta.id} + '/' + ${detalle.producto.id}}" class="btn btn-outline btn-sm">
+                                        <i class="fa-solid fa-pen-to-square icon"></i>
+                                    </a>
+                                    <a th:href="@{'/detalleVenta/eliminar/' + ${detalle.venta.id} + '/' + ${detalle.producto.id}}" 
+                                       class="btn btn-outline btn-sm" 
+                                       style="color:#dc2626;"
+                                       onclick="return confirm('¿Eliminar detalle de venta?');">
+                                        <i class="fa-solid fa-trash icon"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${detalleVentas == null or detalleVentas.empty}">
+                            <td colspan="6" class="text-center p-6 text-gray-500">
+                                No hay detalles de venta registrados.
+                                <a th:href="@{/detalleVenta/nuevo}" class="btn btn-primary btn-sm mt-2">
+                                    Agregar el primero
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Total calculation if viewing specific venta -->
+            <div th:if="${ventaId != null}" class="mt-6">
+                <div class="card">
+                    <div class="card-content">
+                        <div class="text-right">
+                            <div class="text-lg font-semibold">
+                                Total de la Venta: $<span th:text="${#numbers.formatDecimal(detalleVentas.![cantidad * precioVentaUnidad].sum(), 1, 2)}">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

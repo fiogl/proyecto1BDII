@@ -1,6 +1,8 @@
 package com.oracle.demoproyecto1BDII.controller;
 import com.oracle.demoproyecto1BDII.model.Producto;
 import com.oracle.demoproyecto1BDII.service.ProductoService;
+import com.oracle.demoproyecto1BDII.service.CategoriaService;
+import com.oracle.demoproyecto1BDII.service.MarcaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -9,9 +11,13 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/productos")
 public class ProductoController {
     private final ProductoService service;
+    private final CategoriaService categoriaService;
+    private final MarcaService marcaService;
 
-    public ProductoController(ProductoService service) {
+    public ProductoController(ProductoService service, CategoriaService categoriaService, MarcaService marcaService) {
         this.service = service;
+        this.categoriaService = categoriaService;
+        this.marcaService = marcaService;
     }
 
     @GetMapping
@@ -23,6 +29,8 @@ public class ProductoController {
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         model.addAttribute("producto", new Producto());
+        model.addAttribute("categorias", categoriaService.listar());
+        model.addAttribute("marcas", marcaService.listar());
         return "productos/form";
     }
 
@@ -34,13 +42,21 @@ public class ProductoController {
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        model.addAttribute("producto", service.buscar(id));
+        Producto producto = service.buscar(id);
+        if (producto == null) {
+            return "redirect:/productos";
+        }
+        model.addAttribute("producto", producto);
+        model.addAttribute("categorias", categoriaService.listar());
+        model.addAttribute("marcas", marcaService.listar());
         return "productos/form";
     }
 
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+        if (id != null) {
+            service.eliminar(id);
+        }
         return "redirect:/productos";
     }
 }

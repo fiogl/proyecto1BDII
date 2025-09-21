@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title th:text="${detalleVenta.id == null} ? 'Nuevo Detalle de Venta' : 'Editar Detalle de Venta'">Detalle Venta</title>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-1 p-6">
+        <div class="container max-w-3xl mx-auto">
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold" th:text="${detalleVenta.id == null} ? 'Nuevo Detalle de Venta' : 'Editar Detalle de Venta'"></h1>
+                <p style="color: var(--muted-foreground);">Completa los datos del detalle de venta</p>
+            </div>
+
+            <!-- Formulario -->
+            <div class="card">
+                <form th:action="@{/detalleVenta}" th:object="${detalleVenta}" method="post" class="card-content space-y-4">
+                    <!-- Hidden fields for composite key -->
+                    <input type="hidden" th:field="*{id.idVenta}"/>
+                    <input type="hidden" th:field="*{id.idProducto}"/>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Venta *</label>
+                            <select th:field="*{venta.id}" class="form-select" required>
+                                <option value="">Seleccionar venta</option>
+                                <option th:each="venta : ${ventas}" 
+                                        th:value="${venta.id}" 
+                                        th:text="'Venta #' + ${venta.id} + ' - ' + ${#dates.format(venta.fecha, 'dd/MM/yyyy HH:mm')}">
+                                </option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Producto *</label>
+                            <select th:field="*{producto.id}" class="form-select" required>
+                                <option value="">Seleccionar producto</option>
+                                <option th:each="producto : ${productos}" 
+                                        th:value="${producto.id}" 
+                                        th:text="${producto.nombre + ' - $' + producto.precioDetalle}">
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">Cantidad *</label>
+                            <input type="number" th:field="*{cantidad}" class="form-input" min="1" required/>
+                        </div>
+
+                        <div>
+                            <label class="form-label">Precio de Venta por Unidad *</label>
+                            <input type="number" th:field="*{precioVentaUnidad}" class="form-input" step="0.01" min="0" required/>
+                        </div>
+                    </div>
+
+                    <!-- Subtotal calculation display -->
+                    <div class="p-4 bg-gray-50 rounded-lg">
+                        <div class="text-sm text-gray-600">Subtotal calculado:</div>
+                        <div class="text-lg font-semibold" id="subtotalDisplay">$0.00</div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex justify-end gap-4 pt-4">
+                        <a th:href="@{/detalleVenta}" class="btn btn-outline">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar Detalle</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script>
+        // Calculate subtotal when quantity or price changes
+        function calculateSubtotal() {
+            const cantidad = parseFloat(document.querySelector('input[name="cantidad"]').value) || 0;
+            const precio = parseFloat(document.querySelector('input[name="precioVentaUnidad"]').value) || 0;
+            const subtotal = cantidad * precio;
+            document.getElementById('subtotalDisplay').textContent = '$' + subtotal.toFixed(2);
+        }
+
+        // Add event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const cantidadInput = document.querySelector('input[name="cantidad"]');
+            const precioInput = document.querySelector('input[name="precioVentaUnidad"]');
+            
+            if (cantidadInput) cantidadInput.addEventListener('input', calculateSubtotal);
+            if (precioInput) precioInput.addEventListener('input', calculateSubtotal);
+            
+            // Calculate initial subtotal
+            calculateSubtotal();
+        });
+    </script>
+</body>
+</html>

@@ -4,7 +4,7 @@
     <title>Reportes - Pink Hazze</title>
 </head>
 <body class="min-h-screen flex flex-col">
-    <nav th:replace="~{presentation/layout :: navbar}"></nav>
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
 
     <main class="flex-1 p-6">
         <div class="container">
@@ -274,7 +274,6 @@
     </main>
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
-    <div th:replace="~{fragments/layout :: scripts}"></div>
 
     <script>
         // Datos de ejemplo para los reportes
@@ -447,29 +446,5 @@
         });
     </script>
 
-    <style>
-        .tab-button {
-            padding: 12px 24px;
-            border: none;
-            background: transparent;
-            color: var(--muted-foreground);
-            border-bottom: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .tab-button:hover {
-            color: var(--foreground);
-        }
-
-        .tab-button.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
-        }
-
-        .report-section {
-            animation: fadeIn 0.3s ease-out;
-        }
-    </style>
 </body>
 </html>

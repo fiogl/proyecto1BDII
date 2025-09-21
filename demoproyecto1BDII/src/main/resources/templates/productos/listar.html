@@ -28,8 +28,9 @@
         <tr>
           <th>Nombre</th>
           <th>Categoría</th>
-          <th>Precio</th>
-          <th>Stock</th>
+          <th>Marca</th>
+          <th>Precio Detalle</th>
+          <th>Cantidad</th>
           <th>Acciones</th>
         </tr>
         </thead>
@@ -38,18 +39,17 @@
           <td>
             <div>
               <div class="font-semibold" th:text="${producto.nombre}">Producto</div>
-              <div class="text-sm text-gray-500"
-                   th:text="${producto.descripcion}">Descripción</div>
             </div>
           </td>
-          <td th:text="${producto.categoria}">Categoría</td>
-          <td th:text="'$' + ${producto.precio}">$0.00</td>
+          <td th:text="${producto.categoria.nombre}">Categoría</td>
+          <td th:text="${producto.marca.nombre}">Marca</td>
+          <td th:text="'$' + ${producto.precioDetalle}">$0.00</td>
           <td>
                         <span class="px-2 py-1 rounded text-sm"
-                              th:classappend="${producto.stock > 10 ? 'bg-green-100 text-green-800' :
-                                               producto.stock > 0 ? 'bg-yellow-100 text-yellow-800' :
+                              th:classappend="${producto.cantidad > 10 ? 'bg-green-100 text-green-800' :
+                                               producto.cantidad > 0 ? 'bg-yellow-100 text-yellow-800' :
                                                'bg-red-100 text-red-800'}"
-                              th:text="${producto.stock}">0</span>
+                              th:text="${producto.cantidad}">0</span>
           </td>
           <td>
             <div class="flex gap-2">
@@ -67,7 +67,7 @@
           </td>
         </tr>
         <tr th:if="${productos == null or productos.empty}">
-          <td colspan="5" class="text-center p-6 text-gray-500">
+          <td colspan="6" class="text-center p-6 text-gray-500">
             No hay productos registrados.
             <a th:href="@{/productos/nuevo}" class="btn btn-primary btn-sm mt-2">
               Agregar el primero

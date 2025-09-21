@@ -9,6 +9,7 @@ import com.oracle.demoproyecto1BDII.service.ProvinciaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -28,7 +29,6 @@ public class ClienteController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("clientes", service.listar());
-        model.addAttribute("cliente", new Cliente());
         model.addAttribute("provincias", provinciaService.listar());
 
         // Crear e inicializar completamente el objeto cliente para el modal
@@ -41,7 +41,6 @@ public class ClienteController {
         clienteVacio.setCanton(canton);
 
         model.addAttribute("cliente", clienteVacio);
-        model.addAttribute("provincias", provinciaService.listar());
         return "cliente/listar";
     }
 
@@ -52,11 +51,6 @@ public class ClienteController {
         return "cliente/form";
     }
 
-    @GetMapping("/cantones")
-    @ResponseBody
-    public List<Canton> obtenerCantones(@RequestParam Long id_provincia) {
-        return cantonService.listarPorProvincia(id_provincia);
-    }
 
     @PostMapping
     public String guardar(@ModelAttribute Cliente cliente) {
@@ -71,18 +65,31 @@ public class ClienteController {
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        model.addAttribute("cliente", service.buscar(id));
+        Cliente cliente = service.buscar(id);
+        if (cliente == null) {
+            return "redirect:/cliente";
+        }
+        model.addAttribute("cliente", cliente);
+        model.addAttribute("provincias", provinciaService.listar());
         return "cliente/form";
     }
 
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+        if (id != null) {
+            service.eliminar(id);
+        }
         return "redirect:/cliente";
     }
 
     @GetMapping("/")
     public String cliente() {
         return "cliente";
+    }
+
+    @GetMapping("/cantones")
+    @ResponseBody
+    public List<Canton> getCantonesByProvincia(@RequestParam Long provinciaId) {
+        return cantonService.listarPorProvincia(provinciaId);
     }
 }

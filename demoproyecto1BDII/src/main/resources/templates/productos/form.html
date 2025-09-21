@@ -24,33 +24,45 @@
                     <input type="text" th:field="*{nombre}" class="form-input" required/>
                 </div>
 
-                <div>
-                    <label class="form-label">Descripción</label>
-                    <textarea th:field="*{descripcion}" class="form-textarea" rows="3"></textarea>
-                </div>
-
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="form-label">Categoría *</label>
-                        <select th:field="*{categoria}" class="form-select" required>
+                        <select th:field="*{categoria.id}" class="form-select" required>
                             <option value="">Seleccionar</option>
-                            <option>Limpiadores</option>
-                            <option>Hidratantes</option>
-                            <option>Serums</option>
-                            <option>Protectores</option>
-                            <option>Mascarillas</option>
+                            <option th:each="cat : ${categorias}" 
+                                    th:value="${cat.id}" 
+                                    th:text="${cat.nombre}">
+                            </option>
                         </select>
                     </div>
 
                     <div>
-                        <label class="form-label">Precio *</label>
-                        <input type="number" th:field="*{precio}" class="form-input" step="0.01" min="0" required/>
+                        <label class="form-label">Marca *</label>
+                        <select th:field="*{marca.id}" class="form-select" required>
+                            <option value="">Seleccionar</option>
+                            <option th:each="marca : ${marcas}" 
+                                    th:value="${marca.id}" 
+                                    th:text="${marca.nombre}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">Precio Detalle *</label>
+                        <input type="number" th:field="*{precioDetalle}" class="form-input" step="0.01" min="0" required/>
+                    </div>
+
+                    <div>
+                        <label class="form-label">Cantidad *</label>
+                        <input type="number" th:field="*{cantidad}" class="form-input" min="0" required/>
                     </div>
                 </div>
 
                 <div>
-                    <label class="form-label">Stock *</label>
-                    <input type="number" th:field="*{stock}" class="form-input" min="0" required/>
+                    <label class="form-label">Porcentaje Mayorista *</label>
+                    <input type="number" th:field="*{porcentajeMayor}" class="form-input" step="0.01" min="0" max="100" required/>
                 </div>
 
                 <!-- Botones -->

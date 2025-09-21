@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}">
+    <title th:text="${venta.id == null} ? 'Nueva Venta' : 'Editar Venta'">Venta</title>
+</head>
+<body class="min-h-screen flex flex-col">
+    <nav th:replace="~{fragments/layout :: navbar}"></nav>
+
+    <main class="flex-1 p-6">
+        <div class="container max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="mb-6">
+                <h1 class="text-3xl font-bold" th:text="${venta.id == null} ? 'Nueva Venta' : 'Editar Venta'"></h1>
+                <p style="color: var(--muted-foreground);">Completa los datos de la venta</p>
+            </div>
+
+            <!-- Formulario -->
+            <div class="card">
+                <form th:action="@{/ventas}" th:object="${venta}" method="post" class="card-content space-y-4">
+                    <input type="hidden" th:field="*{id}"/>
+
+                    <!-- Información del cliente -->
+                    <div class="mb-6">
+                        <h4 class="font-semibold mb-3">Información del Cliente</h4>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="form-label">Cliente *</label>
+                                <select th:field="*{cliente.id}" class="form-select" required>
+                                    <option value="">Seleccionar cliente</option>
+                                    <option th:each="cliente : ${clientes}" 
+                                            th:value="${cliente.idCliente}" 
+                                            th:text="${cliente.nombre + ' ' + cliente.pApellido + ' ' + cliente.sApellido}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Fecha *</label>
+                                <input type="datetime-local" th:field="*{fecha}" class="form-input" required/>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mensaje -->
+                    <div>
+                        <label class="form-label">Mensaje</label>
+                        <textarea th:field="*{mensaje}" class="form-textarea" rows="3" placeholder="Mensaje adicional (opcional)"></textarea>
+                    </div>
+
+                    <!-- Productos -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h4 class="font-semibold">Productos</h4>
+                            <button type="button" onclick="addProductLine()" class="btn btn-secondary btn-sm">
+                                <i class="fa-solid fa-plus icon"></i>
+                                Agregar Producto
+                            </button>
+                        </div>
+                        <div id="productLines">
+                            <!-- Las líneas de productos se agregarán aquí -->
+                        </div>
+                    </div>
+
+                    <!-- Total -->
+                    <div class="p-4 bg-gray-50 rounded-lg mb-4">
+                        <div class="text-right">
+                            <div class="text-lg font-semibold">
+                                Total: $<span id="totalAmount">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="flex justify-end gap-4 pt-4">
+                        <a th:href="@{/ventas}" class="btn btn-outline">Cancelar</a>
+                        <button type="submit" class="btn btn-primary">Guardar Venta</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+    <script>
+        let productLineCounter = 0;
+
+        // Productos disponibles desde el backend
+        const availableProducts = [
+            <th:block th:each="producto : ${productos}">
+            { id: <span th:text="${producto.id}"></span>, name: '<span th:text="${producto.nombre}"></span>', price: <span th:text="${producto.precioDetalle}"></span> },
+            </th:block>
+        ];
+
+        function addProductLine() {
+            productLineCounter++;
+            const container = document.getElementById('productLines');
+            const lineDiv = document.createElement('div');
+            lineDiv.className = 'grid grid-cols-12 gap-2 items-end mb-3 p-3 border rounded-lg';
+            lineDiv.id = `productLine${productLineCounter}`;
+
+            lineDiv.innerHTML = `
+                <div class="col-span-5">
+                    <label class="form-label">Producto</label>
+                    <select class="form-select" onchange="updatePrice(${productLineCounter})" name="productoIds" id="product${productLineCounter}">
+                        <option value="">Seleccionar producto</option>
+                        ${availableProducts.map(p => `<option value="${p.id}" data-price="${p.price}">${p.name}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="col-span-2">
+                    <label class="form-label">Precio</label>
+                    <input type="number" class="form-input" step="0.01" readonly name="precios" id="price${productLineCounter}">
+                </div>
+                <div class="col-span-2">
+                    <label class="form-label">Cantidad</label>
+                    <input type="number" class="form-input" min="1" value="1" onchange="updateLineTotal(${productLineCounter})" name="cantidades" id="quantity${productLineCounter}">
+                </div>
+                <div class="col-span-2">
+                    <label class="form-label">Subtotal</label>
+                    <input type="number" class="form-input" step="0.01" readonly id="subtotal${productLineCounter}">
+                </div>
+                <div class="col-span-1">
+                    <button type="button" onclick="removeProductLine(${productLineCounter})" class="btn btn-outline btn-sm" style="color: #dc2626;">
+                        <i class="fa-solid fa-xmark icon"></i>
+                    </button>
+                </div>
+            `;
+
+            container.appendChild(lineDiv);
+        }
+
+        function removeProductLine(lineId) {
+            const line = document.getElementById(`productLine${lineId}`);
+            if (line) {
+                line.remove();
+                updateTotal();
+            }
+        }
+
+        function updatePrice(lineId) {
+            const select = document.getElementById(`product${lineId}`);
+            const priceInput = document.getElementById(`price${lineId}`);
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (selectedOption.value) {
+                priceInput.value = selectedOption.dataset.price;
+                updateLineTotal(lineId);
+            } else {
+                priceInput.value = '';
+                document.getElementById(`subtotal${lineId}`).value = '';
+                updateTotal();
+            }
+        }
+
+        function updateLineTotal(lineId) {
+            const price = parseFloat(document.getElementById(`price${lineId}`).value) || 0;
+            const quantity = parseInt(document.getElementById(`quantity${lineId}`).value) || 0;
+            const subtotal = price * quantity;
+
+            document.getElementById(`subtotal${lineId}`).value = subtotal.toFixed(2);
+            updateTotal();
+        }
+
+        function updateTotal() {
+            let total = 0;
+            const subtotalInputs = document.querySelectorAll('[id^="subtotal"]');
+
+            subtotalInputs.forEach(input => {
+                const value = parseFloat(input.value) || 0;
+                total += value;
+            });
+
+            document.getElementById('totalAmount').textContent = total.toFixed(2);
+        }
+
+        // Add initial product line when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            addProductLine();
+        });
+    </script>
+</body>
+</html>

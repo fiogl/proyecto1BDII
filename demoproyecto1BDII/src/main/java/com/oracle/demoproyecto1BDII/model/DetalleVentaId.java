@@ -13,6 +13,9 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DetalleVentaId implements Serializable {
-    @Column(name="id_venta")    private Long idVenta;
-    @Column(name="id_producto") private Long idProducto;
+    @Column(name="id_venta")    
+    private Long idVenta;
+
+    @Column(name="id_producto") 
+    private Long idProducto;
 }

@@ -16,7 +16,7 @@ public class MarcaController {
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("marca", service.listar());
+        model.addAttribute("marcas", service.listar());
         return "marca/listar";
     }
 
@@ -29,18 +29,24 @@ public class MarcaController {
     @PostMapping
     public String guardar(@ModelAttribute Marca marca) {
         service.guardar(marca);
-        return "redirect:/cliente";
+        return "redirect:/marca";
     }
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        model.addAttribute("marca", service.buscar(id));
+        Marca marca = service.buscar(id);
+        if (marca == null) {
+            return "redirect:/marca";
+        }
+        model.addAttribute("marca", marca);
         return "marca/form";
     }
 
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
-        service.eliminar(id);
+        if (id != null) {
+            service.eliminar(id);
+        }
         return "redirect:/marca";
     }
 }

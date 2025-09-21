@@ -4,7 +4,7 @@
     <title>Ventas - Pink Hazze</title>
 </head>
 <body class="min-h-screen flex flex-col">
-    <nav th:replace="~{presentation/layout :: navbar}"></nav>
+    <div th:replace="~{fragments/layout :: navbar}"></div>
 
     <main class="flex-1 p-6">
         <div class="container">
@@ -15,10 +15,10 @@
                         <h1 class="text-3xl font-bold">Gestión de Ventas</h1>
                         <p style="color: var(--muted-foreground);">Registra y administra las ventas de tu tienda</p>
                     </div>
-                    <button onclick="openSaleModal()" class="btn btn-primary">
+                    <a th:href="@{/ventas/nuevo}" class="btn btn-primary">
                         <i class="fa-solid fa-plus icon"></i>
                         Nueva Venta
-                    </button>
+                    </a>
                 </div>
 
                 <!-- Resumen de ventas -->
@@ -84,34 +84,31 @@
                                 <td th:text="${#dates.format(venta.fecha, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
                                 <td>
                                     <div>
-                                        <div class="font-semibold" th:text="${venta.cliente}">Cliente</div>
-                                        <div class="text-sm" style="color: var(--muted-foreground);" th:text="${venta.email}">email@ejemplo.com</div>
+                                        <div class="font-semibold" th:text="${venta.cliente.nombre + ' ' + venta.cliente.pApellido + ' ' + venta.cliente.sApellido}">Cliente</div>
+                                        <div class="text-sm" style="color: var(--muted-foreground);" th:text="${venta.cliente.email}">email@ejemplo.com</div>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="text-sm">
-                                        <span th:text="${venta.cantidadProductos}">0</span> producto(s)
+                                        <span th:text="${venta.detalles.size()}">0</span> producto(s)
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="font-semibold" th:text="'$' + ${venta.total}">$0.00</div>
+                                    <div class="font-semibold">-</div>
                                 </td>
                                 <td>
-                                    <span class="px-2 py-1 rounded text-sm"
-                                          th:classappend="${venta.estado == 'completada' ? 'bg-green-100 text-green-800' : venta.estado == 'pendiente' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}"
-                                          th:text="${venta.estado}">Estado</span>
+                                    <span class="px-2 py-1 rounded text-sm bg-green-100 text-green-800">
+                                        Completada
+                                    </span>
                                 </td>
                                 <td>
                                     <div class="flex gap-2">
-                                        <button th:onclick="'viewSale(' + ${venta.id} + ')'" class="btn btn-outline btn-sm">
-                                            <i class="fa-solid fa-eye icon"></i>
-                                        </button>
-                                        <button th:onclick="'editSale(' + ${venta.id} + ')'" class="btn btn-outline btn-sm">
+                                        <a th:href="@{'/ventas/editar/' + ${venta.id}}" class="btn btn-outline btn-sm">
                                             <i class="fa-solid fa-pen-to-square icon"></i>
-                                        </button>
-                                        <button th:onclick="'deleteSale(' + ${venta.id} + ')'" class="btn btn-outline btn-sm" style="color: #dc2626;">
+                                        </a>
+                                        <a th:href="@{'/ventas/eliminar/' + ${venta.id}}" class="btn btn-outline btn-sm" style="color: #dc2626;" onclick="return confirm('¿Eliminar venta?');">
                                             <i class="fa-solid fa-trash icon"></i>
-                                        </button>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -120,9 +117,9 @@
                             <tr th:if="${ventas == null or ventas.empty}">
                                 <td colspan="6" class="text-center p-6" style="color: var(--muted-foreground);">
                                     No hay ventas registradas.
-                                    <button onclick="openSaleModal()" class="btn btn-primary btn-sm mt-2">
+                                    <a th:href="@{/ventas/nuevo}" class="btn btn-primary btn-sm mt-2">
                                         Registrar la primera
-                                    </button>
+                                    </a>
                                 </td>
                             </tr>
                         </tbody>
@@ -141,258 +138,6 @@
         </div>
     </main>
 
-    <!-- Modal de Venta -->
-    <div id="saleModal" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h3 class="modal-title" id="saleModalTitle">Nueva Venta</h3>
-                <button class="modal-close" onclick="closeSaleModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="saleForm">
-                    <input type="hidden" id="saleId">
-
-                    <!-- Información del cliente -->
-                    <div class="mb-6">
-                        <h4 class="font-semibold mb-3">Información del Cliente</h4>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div class="form-group">
-                                <label for="clientName" class="form-label">Nombre *</label>
-                                <input type="text" id="clientName" class="form-input" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="clientEmail" class="form-label">Email</label>
-                                <input type="email" id="clientEmail" class="form-input">
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Productos -->
-                    <div class="mb-6">
-                        <div class="flex justify-between items-center mb-3">
-                            <h4 class="font-semibold">Productos</h4>
-                            <button type="button" onclick="addProductLine()" class="btn btn-secondary btn-sm">
-                                <i class="fa-solid fa-plus icon"></i>
-                                Agregar Producto
-                            </button>
-                        </div>
-                        <div id="productLines">
-                            <!-- Las líneas de productos se agregarán aquí -->
-                        </div>
-                    </div>
-
-                    <!-- Total -->
-                    <div class="text-right">
-                        <div class="text-lg font-semibold">
-                            Total: $<span id="totalAmount">0.00</span>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline" onclick="closeSaleModal()">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="saveSale()">Guardar Venta</button>
-            </div>
-        </div>
-    </div>
-
-    <footer th:replace="~{fragments/layout :: footer}"></footer>
-    <div th:replace="~{fragments/layout :: scripts}"></div>
-
-    <script>
-        let productLineCounter = 0;
-
-        // Productos disponibles (esto vendría del backend)
-        const availableProducts = [
-            { id: 1, name: 'Limpiador Facial Suave', price: 25.99, stock: 50 },
-            { id: 2, name: 'Crema Hidratante Anti-Edad', price: 35.50, stock: 30 },
-            { id: 3, name: 'Serum Vitamina C', price: 42.00, stock: 25 },
-            { id: 4, name: 'Protector Solar SPF 50', price: 28.75, stock: 40 },
-            { id: 5, name: 'Mascarilla Purificante', price: 18.99, stock: 35 }
-        ];
-
-        function openSaleModal(saleId = null) {
-            const modal = document.getElementById('saleModal');
-            const title = document.getElementById('saleModalTitle');
-            const form = document.getElementById('saleForm');
-
-            if (saleId) {
-                title.textContent = 'Editar Venta';
-                loadSaleData(saleId);
-            } else {
-                title.textContent = 'Nueva Venta';
-                form.reset();
-                document.getElementById('saleId').value = '';
-                document.getElementById('productLines').innerHTML = '';
-                document.getElementById('totalAmount').textContent = '0.00';
-                addProductLine(); // Agregar la primera línea
-            }
-
-            modal.classList.add('show');
-        }
-
-        function closeSaleModal() {
-            document.getElementById('saleModal').classList.remove('show');
-        }
-
-        function addProductLine() {
-            productLineCounter++;
-            const container = document.getElementById('productLines');
-            const lineDiv = document.createElement('div');
-            lineDiv.className = 'grid grid-cols-12 gap-2 items-end mb-3';
-            lineDiv.id = `productLine${productLineCounter}`;
-
-            lineDiv.innerHTML = `
-                <div class="col-span-5">
-                    <label class="form-label">Producto</label>
-                    <select class="form-select" onchange="updatePrice(${productLineCounter})" id="product${productLineCounter}">
-                        <option value="">Seleccionar producto</option>
-                        ${availableProducts.map(p => `<option value="${p.id}" data-price="${p.price}" data-stock="${p.stock}">${p.name}</option>`).join('')}
-                    </select>
-                </div>
-                <div class="col-span-2">
-                    <label class="form-label">Precio</label>
-                    <input type="number" class="form-input" step="0.01" readonly id="price${productLineCounter}">
-                </div>
-                <div class="col-span-2">
-                    <label class="form-label">Cantidad</label>
-                    <input type="number" class="form-input" min="1" value="1" onchange="updateLineTotal(${productLineCounter})" id="quantity${productLineCounter}">
-                </div>
-                <div class="col-span-2">
-                    <label class="form-label">Subtotal</label>
-                    <input type="number" class="form-input" step="0.01" readonly id="subtotal${productLineCounter}">
-                </div>
-                <div class="col-span-1">
-                    <button type="button" onclick="removeProductLine(${productLineCounter})" class="btn btn-outline btn-sm" style="color: #dc2626;">
-                        <i class="fa-solid fa-xmark icon"></i>
-                    </button>
-                </div>
-            `;
-
-            container.appendChild(lineDiv);
-        }
-
-        function removeProductLine(lineId) {
-            const line = document.getElementById(`productLine${lineId}`);
-            if (line) {
-                line.remove();
-                updateTotal();
-            }
-        }
-
-        function updatePrice(lineId) {
-            const select = document.getElementById(`product${lineId}`);
-            const priceInput = document.getElementById(`price${lineId}`);
-            const selectedOption = select.options[select.selectedIndex];
-
-            if (selectedOption.value) {
-                priceInput.value = selectedOption.dataset.price;
-                updateLineTotal(lineId);
-            } else {
-                priceInput.value = '';
-                document.getElementById(`subtotal${lineId}`).value = '';
-                updateTotal();
-            }
-        }
-
-        function updateLineTotal(lineId) {
-            const price = parseFloat(document.getElementById(`price${lineId}`).value) || 0;
-            const quantity = parseInt(document.getElementById(`quantity${lineId}`).value) || 0;
-            const subtotal = price * quantity;
-
-            document.getElementById(`subtotal${lineId}`).value = subtotal.toFixed(2);
-            updateTotal();
-        }
-
-        function updateTotal() {
-            let total = 0;
-            const subtotalInputs = document.querySelectorAll('[id^="subtotal"]');
-
-            subtotalInputs.forEach(input => {
-                const value = parseFloat(input.value) || 0;
-                total += value;
-            });
-
-            document.getElementById('totalAmount').textContent = total.toFixed(2);
-        }
-
-        function saveSale() {
-            const form = document.getElementById('saleForm');
-            const clientName = document.getElementById('clientName').value;
-
-            if (!clientName.trim()) {
-                alert('El nombre del cliente es requerido');
-                return;
-            }
-
-            const productLines = document.querySelectorAll('[id^="productLine"]');
-            if (productLines.length === 0) {
-                alert('Debe agregar al menos un producto');
-                return;
-            }
-
-            // Validar que todos los productos tengan valores válidos
-            let hasValidProducts = false;
-            productLines.forEach(line => {
-                const lineId = line.id.replace('productLine', '');
-                const productSelect = document.getElementById(`product${lineId}`);
-                const quantity = document.getElementById(`quantity${lineId}`).value;
-
-                if (productSelect.value && quantity > 0) {
-                    hasValidProducts = true;
-                }
-            });
-
-            if (!hasValidProducts) {
-                alert('Debe seleccionar al menos un producto con cantidad válida');
-                return;
-            }
-
-            // Aquí iría la lógica para guardar la venta
-            alert('Venta guardada correctamente');
-            closeSaleModal();
-            location.reload();
-        }
-
-        function viewSale(id) {
-            alert('Ver detalles de la venta #' + id);
-        }
-
-        function editSale(id) {
-            openSaleModal(id);
-        }
-
-        function deleteSale(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar esta venta?')) {
-                alert('Venta eliminada correctamente');
-                location.reload();
-            }
-        }
-
-        function loadSaleData(id) {
-            // Cargar datos de ejemplo
-            document.getElementById('saleId').value = id;
-            document.getElementById('clientName').value = 'Cliente ' + id;
-            document.getElementById('clientEmail').value = 'cliente' + id + '@ejemplo.com';
-        }
-
-        // Filtros
-        document.getElementById('fechaDesde').addEventListener('change', filterSales);
-        document.getElementById('fechaHasta').addEventListener('change', filterSales);
-        document.getElementById('clienteFilter').addEventListener('input', filterSales);
-        document.getElementById('estadoFilter').addEventListener('change', filterSales);
-
-        function filterSales() {
-            console.log('Aplicando filtros de ventas...');
-        }
-
-        // Cerrar modal al hacer clic fuera
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('saleModal');
-            if (event.target === modal) {
-                closeSaleModal();
-            }
-        });
-    </script>
+    <div th:replace="~{fragments/layout :: footer}"></div>
 </body>
 </html>

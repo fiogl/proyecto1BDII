@@ -18,7 +18,7 @@ public class CategoriaController {
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("categoria", service.listar());
+        model.addAttribute("categorias", service.listar());
         return "categoria/listar";
     }
 
@@ -36,13 +36,19 @@ public class CategoriaController {
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Long id, Model model) {
-        model.addAttribute("categoria", service.buscar(id));
+        Categoria categoria = service.buscar(id);
+        if (categoria == null) {
+            return "redirect:/categoria";
+        }
+        model.addAttribute("categoria", categoria);
         return "categoria/form";
     }
 
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id) {
-        service.eliminar(id);
-        return "redirect:/productos";
+        if (id != null) {
+            service.eliminar(id);
+        }
+        return "redirect:/categoria";
     }
 }
