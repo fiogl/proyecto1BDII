@@ -62,40 +62,57 @@
                         <div id="productLines">
                             <!-- Productos existentes (solo en edición) -->
                             <div th:if="${venta.id != null and detallesExistentes != null and !detallesExistentes.isEmpty()}">
-                                <div th:each="detalle, iterStat : ${detallesExistentes}" 
-                                     th:id="'productLine' + (${iterStat.index} + 1)"
+                                <div th:each="detalle, iterStat : ${detallesExistentes}"
+                                     th:id="'productLine' + (${iterStat.index + 1})"
                                      class="grid grid-cols-12 gap-2 items-end mb-3 p-3 border rounded-lg bg-blue-50">
+
                                     <div class="col-span-5">
                                         <label class="form-label">Producto</label>
-                                        <select class="form-select" onchange="updatePrice([[${iterStat.index} + 1]])" name="productoIds" th:id="'product' + ${iterStat.index + 1}">
+                                        <select class="form-select"
+                                                th:id="'product' + (${iterStat.index + 1})"
+                                                name="productoIds"
+                                                th:onchange="'updatePrice(' + (${iterStat.index + 1}) + ')'" >
                                             <option value="">Seleccionar producto</option>
-                                            <option th:each="producto : ${productos}" 
-                                                    th:value="${producto.id}" 
+                                            <option th:each="producto : ${productos}"
+                                                    th:value="${producto.id}"
                                                     th:selected="${producto.id == detalle.producto.id}"
                                                     th:data-price="${producto.precioDetalle}"
                                                     th:text="${producto.nombre}">
                                             </option>
                                         </select>
                                     </div>
+
                                     <div class="col-span-2">
                                         <label class="form-label">Precio</label>
-                                        <input type="number" class="form-input" step="0.01" readonly name="precios" th:id="'price' + ${iterStat.index + 1}" th:value="${detalle.precioVentaUnidad}">
+                                        <input type="number" class="form-input" step="0.01" readonly
+                                               name="precios" th:id="'price' + (${iterStat.index + 1})"
+                                               th:value="${detalle.precioVentaUnidad}">
                                     </div>
+
                                     <div class="col-span-2">
                                         <label class="form-label">Cantidad</label>
-                                        <input type="number" class="form-input" min="1" onchange="updateLineTotal([[${iterStat.index} + 1]])" name="cantidades" th:id="'quantity' + ${iterStat.index + 1}" th:value="${detalle.cantidad}">
+                                        <input type="number" class="form-input" min="1"
+                                               th:id="'quantity' + (${iterStat.index + 1})"
+                                               th:value="${detalle.cantidad}"
+                                               th:onchange="'updateLineTotal(' + (${iterStat.index + 1}) + ')' "
+                                               name="cantidades">
                                     </div>
+
                                     <div class="col-span-2">
                                         <label class="form-label">Subtotal</label>
-                                        <input type="number" class="form-input" step="0.01" readonly th:id="'subtotal' + ${iterStat.index + 1}" th:value="${#numbers.formatDecimal(detalle.cantidad * detalle.precioVentaUnidad, 1, 2)}">
+                                        <input type="number" class="form-input" step="0.01" readonly
+                                               th:id="'subtotal' + (${iterStat.index + 1})"
+                                               th:value="${#numbers.formatDecimal(detalle.cantidad * detalle.precioVentaUnidad, 1, 2)}">
                                     </div>
+
                                     <div class="col-span-1">
-                                        <button type="button" 
-                                                th:onclick="'removeProductLine(' + (${iterStat.index} + 1) + ', ' + ${detalle.id.idProducto} + ')'"
+                                        <button type="button"
+                                                th:onclick="'removeProductLine(' + (${iterStat.index + 1}) + ', ' + ${detalle.id.idProducto} + ')'"
                                                 class="btn btn-outline btn-sm" style="color: #dc2626;">
                                             <i class="fa-solid fa-xmark icon"></i>
                                         </button>
                                     </div>
+
                                 </div>
                             </div>
                             <!-- Las líneas de productos nuevos se agregarán aquí -->
