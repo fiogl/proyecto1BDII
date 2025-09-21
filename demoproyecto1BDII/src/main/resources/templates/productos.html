@@ -13,7 +13,7 @@
                 <div class="flex justify-between items-center mb-6">
                     <div>
                         <h1 class="text-3xl font-bold">Gestión de Productos</h1>
-                        <p style="color: var(--muted-foreground);">Administra tu catálogo de productos de cuidado de la piel</p>
+                        <p style="color: var(--muted-foreground);">Administración del catálogo de productos</p>
                     </div>
                     <a th:href="@{/productos/nuevo}" class="btn btn-primary">
                         <i class="fa-solid fa-plus icon"></i>
@@ -37,7 +37,7 @@
                         </thead>
                         <tbody id="productTableBody">
                             <!-- Los productos se cargarán aquí dinámicamente -->
-                            <tr th:if="${productos != null and !productos.empty}" th:each="producto : ${productos}">
+                            <tr th:if="${productos != null and !productos.isEmpty()}" th:each="producto : ${productos}">
                                 <td>
                                     <div>
                                         <div class="font-semibold" th:text="${producto.nombre}"></div>
@@ -45,10 +45,11 @@
                                 </td>
                                 <td th:text="${producto.categoria.nombre}"></td>
                                 <td th:text="${producto.marca.nombre}"></td>
-                                <td th:text="'$' + ${producto.precioDetalle}"></td>
+                                <td th:text="'₡' + ${producto.precioDetalle}"></td>
                                 <td>
                                     <span class="px-2 py-1 rounded text-sm"
-                                          th:classappend="${producto.cantidad > 10 ? 'bg-green-100 text-green-800' : producto.cantidad > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}"
+                                          th:classappend="${producto.cantidad > 10 ? 'bg-green-100 text-green-800' : (producto.cantidad > 0 ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800')}"
+
                                           th:text="${producto.cantidad}"></span>
                                 </td>
                                 <td>
@@ -69,7 +70,7 @@
                             </tr>
 
                             <!-- Productos de ejemplo si no hay datos -->
-                            <tr th:if="${productos == null or productos.empty}">
+                            <tr th:if="${productos == null or productos.isEmpty()}">
                                 <td colspan="7" class="text-center p-6" style="color: var(--muted-foreground);">
                                     No hay productos registrados.
                                     <a th:href="@{/productos/nuevo}" class="btn btn-primary btn-sm mt-2">

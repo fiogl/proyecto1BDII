@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Controller
@@ -42,10 +43,9 @@ public class ReportesController {
                 .mapToInt(MarcaVentaDTO::getTotalVendido)
                 .sum();
 
-        int totalVentasClientes = consultaService.getVentasPorCliente()
-                .stream()
-                .mapToInt(VentaClienteDTO::getTotalVendido)
-                .sum();
+        BigDecimal totalVentasClientes = ventasClientes.stream()
+                .map(VentaClienteDTO::getTotalVendido) // BigDecimal
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         int totalItemsComprados = ventasClientes.stream()
                 .mapToInt(VentaClienteDTO::getItemsComprados)

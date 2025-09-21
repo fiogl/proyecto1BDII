@@ -3,6 +3,7 @@ package com.oracle.demoproyecto1BDII.service;
 import com.oracle.demoproyecto1BDII.model.MarcaVentaDTO;
 import com.oracle.demoproyecto1BDII.model.VentaClienteDTO;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,26 +37,20 @@ public class ConsultaService {
     }
 
     public List<VentaClienteDTO> getVentasPorCliente() {
-        String sql = """
-        SELECT c.id_cliente AS id_cliente,
-               c.nombre || ' ' || c.p_apellido || ' ' || c.s_apellido AS cliente,
-               NVL(SUM(d.cantidad), 0) AS items_comprados,
-               NVL(SUM(d.cantidad * d.precio_venta_unidad), 0) AS total_ventas
-        FROM clienteP c
-        LEFT JOIN venta v ON v.id_cliente = c.id_cliente
-        LEFT JOIN detalle_venta d ON d.id_venta = v.id_venta
-        GROUP BY c.id_cliente, c.nombre, c.p_apellido, c.s_apellido
-        ORDER BY NVL(SUM(d.cantidad * d.precio_venta_unidad), 0) DESC
-    """;
+        SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
+                .withCatalogName("pk_consultas")        // package de Oracle
+                .withFunctionName("ventas_por_cliente") // función
+                .returningResultSet("RETURN_VALUE", (rs, rowNum) ->
+                        new VentaClienteDTO(
+                                rs.getLong("id_cliente"),
+                                rs.getString("cliente"),
+                                rs.getInt("items_comprados"),
+                                rs.getBigDecimal("total_ventas")
+                        )
+                );
 
-        return jdbcTemplate.query(sql, (rs, rowNum) ->
-                new VentaClienteDTO(
-                        rs.getInt("id_cliente"),
-                        rs.getString("cliente"),
-                        rs.getInt("items_comprados"),
-                        rs.getInt("total_ventas")
-                )
-        );
+        return jdbcCall.executeFunction(List.class);
     }
+
 
 }
