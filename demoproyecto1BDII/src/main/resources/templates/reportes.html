@@ -49,7 +49,7 @@
                                         <tbody id="ventasPeriodoTableBody">
                                         <tr th:each="item : ${marcas}">
                                             <td th:text="${item.marca}">Marca</td>
-                                            <td th:text="${item.totalVendido}">0</td>
+                                            <td th:text="${'₡' + item.totalVendido}">0</td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -63,7 +63,7 @@
                                             <div>
                                                 <div class="font-semibold">Total Vendido</div>
                                                 <div class="text-lg" style="color: var(--primary);"
-                                                th:text="${totalVendidoMarcas}">$0</div>
+                                                th:text="${'₡' + totalVendidoMarcas}">$0</div>
                                             </div>
                                         </div>
                                     </div>
@@ -91,7 +91,7 @@
                                     <tr th:each="v : ${ventasClientes}">
                                         <td th:text="${v.cliente}">Cliente</td>
                                         <td th:text="${v.itemsComprados}">Cliente</td>
-                                        <td th:text="${v.totalVendido}">$0</td>
+                                        <td th:text="${'₡' + v.totalVendido}">$0</td>
                                     </tr>
                                     </tbody>
                                 </table>

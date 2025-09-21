@@ -10,8 +10,13 @@ import com.oracle.demoproyecto1BDII.service.DetalleVentaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/ventas")
@@ -32,15 +37,29 @@ public class VentaController {
 
     @GetMapping
     public String listar(Model model) {
-        model.addAttribute("ventas", service.listar());
+        List<Venta> ventasL = service.listar();
+
+        Map<Long, BigDecimal> totales = new HashMap<>();
+        for (Venta v : ventasL) {
+            BigDecimal total = detalleVentaService.calcularTotalVenta(v.getId());
+            totales.put(v.getId(), total);
+        }
+
+        model.addAttribute("ventas", ventasL);      // usar la lista ya calculada
+        model.addAttribute("totales", totales);     // <-- IMPORTANT: añadir el mapa al modelo
         model.addAttribute("activePage", "ventas");
         return "ventas";
     }
 
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
+        LocalDateTime now = LocalDateTime.now();
         Venta venta = new Venta();
-        venta.setFecha(LocalDateTime.now()); // Set current date/time as default
+        venta.setFecha(now); // Set current date/time as default
+
+        String maxDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        model.addAttribute("maxDate", maxDate);
+
         model.addAttribute("venta", venta);
         model.addAttribute("clientes", clienteService.listar());
         model.addAttribute("productos", productoService.listar());
@@ -111,7 +130,7 @@ public class VentaController {
         // Update the venta
         venta.setId(id);
         Venta ventaActualizada = service.guardar(venta);
-        
+
         // Handle products marked for deletion
         if (productosAEliminar != null && !productosAEliminar.isEmpty()) {
             for (Long productoId : productosAEliminar) {
@@ -162,6 +181,11 @@ public class VentaController {
         if (venta == null) {
             return "redirect:/ventas";
         }
+
+        LocalDateTime now = LocalDateTime.now();
+        String maxDate = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
+        model.addAttribute("maxDate", maxDate);
+
         model.addAttribute("venta", venta);
         model.addAttribute("clientes", clienteService.listar());
         model.addAttribute("productos", productoService.listar());
