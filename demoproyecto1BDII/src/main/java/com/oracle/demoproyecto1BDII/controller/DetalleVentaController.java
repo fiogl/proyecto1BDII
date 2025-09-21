@@ -2,8 +2,6 @@ package com.oracle.demoproyecto1BDII.controller;
 
 import com.oracle.demoproyecto1BDII.model.DetalleVenta;
 import com.oracle.demoproyecto1BDII.model.DetalleVentaId;
-import com.oracle.demoproyecto1BDII.model.Venta;
-import com.oracle.demoproyecto1BDII.model.Producto;
 import com.oracle.demoproyecto1BDII.service.DetalleVentaService;
 import com.oracle.demoproyecto1BDII.service.VentaService;
 import com.oracle.demoproyecto1BDII.service.ProductoService;

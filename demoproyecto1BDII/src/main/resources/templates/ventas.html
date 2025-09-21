@@ -81,10 +81,10 @@
                         </thead>
                         <tbody id="salesTableBody">
                             <tr th:if="${ventas != null and !ventas.empty}" th:each="venta : ${ventas}">
-                                <td th:text="${#dates.format(venta.fecha, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
+                                <td th:text="${#temporals.format(venta.fecha, 'dd/MM/yyyy HH:mm')}">01/01/2024 10:00</td>
                                 <td>
                                     <div>
-                                        <div class="font-semibold" th:text="${venta.cliente.nombre + ' ' + venta.cliente.pApellido + ' ' + venta.cliente.sApellido}">Cliente</div>
+                                        <div class="font-semibold" th:text="${venta.cliente.nombre + ' ' + venta.cliente.primerApellido + ' ' + venta.cliente.segundoApellido}">Cliente</div>
                                         <div class="text-sm" style="color: var(--muted-foreground);" th:text="${venta.cliente.email}">email@ejemplo.com</div>
                                     </div>
                                 </td>

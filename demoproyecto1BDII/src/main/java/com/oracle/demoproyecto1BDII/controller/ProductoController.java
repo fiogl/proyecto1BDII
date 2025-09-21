@@ -23,7 +23,8 @@ public class ProductoController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("productos", service.listar());
-        return "productos/listar";
+        model.addAttribute("categorias", categoriaService.listar());
+        return "productos";
     }
 
     @GetMapping("/nuevo")

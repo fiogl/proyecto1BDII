@@ -1,8 +1,6 @@
 package com.oracle.demoproyecto1BDII.controller;
 import com.oracle.demoproyecto1BDII.model.Categoria;
-import com.oracle.demoproyecto1BDII.model.Producto;
 import com.oracle.demoproyecto1BDII.service.CategoriaService;
-import com.oracle.demoproyecto1BDII.service.ProductoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;

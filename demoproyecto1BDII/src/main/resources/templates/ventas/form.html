@@ -16,7 +16,7 @@
 
             <!-- Formulario -->
             <div class="card">
-                <form th:action="@{/ventas}" th:object="${venta}" method="post" class="card-content space-y-4">
+                <form th:action="${venta.id != null ? '/ventas/editar/' + venta.id : '/ventas'}" th:object="${venta}" method="post" class="card-content space-y-4">
                     <input type="hidden" th:field="*{id}"/>
 
                     <!-- Información del cliente -->
@@ -28,14 +28,17 @@
                                 <select th:field="*{cliente.id}" class="form-select" required>
                                     <option value="">Seleccionar cliente</option>
                                     <option th:each="cliente : ${clientes}" 
-                                            th:value="${cliente.idCliente}" 
-                                            th:text="${cliente.nombre + ' ' + cliente.pApellido + ' ' + cliente.sApellido}">
+                                            th:value="${cliente.id}" 
+                                            th:text="${cliente.nombre + ' ' + cliente.primerApellido + ' ' + cliente.segundoApellido}">
                                     </option>
                                 </select>
                             </div>
                             <div>
                                 <label class="form-label">Fecha *</label>
-                                <input type="datetime-local" th:field="*{fecha}" class="form-input" required/>
+                                <input type="datetime-local" 
+                                       name="fecha"
+                                       th:value="${venta.fecha != null ? #temporals.format(venta.fecha, 'yyyy-MM-dd''T''HH:mm') : ''}"
+                                       class="form-input" required/>
                             </div>
                         </div>
                     </div>
@@ -56,7 +59,45 @@
                             </button>
                         </div>
                         <div id="productLines">
-                            <!-- Las líneas de productos se agregarán aquí -->
+                            <!-- Productos existentes (solo en edición) -->
+                            <div th:if="${venta.id != null and detallesExistentes != null and !detallesExistentes.empty}">
+                                <div th:each="detalle, iterStat : ${detallesExistentes}" 
+                                     th:id="'productLine' + (${iterStat.index} + 1)"
+                                     class="grid grid-cols-12 gap-2 items-end mb-3 p-3 border rounded-lg bg-blue-50">
+                                    <div class="col-span-5">
+                                        <label class="form-label">Producto</label>
+                                        <select class="form-select" onchange="updatePrice([[${iterStat.index} + 1]])" name="productoIds" th:id="'product' + ${iterStat.index + 1}">
+                                            <option value="">Seleccionar producto</option>
+                                            <option th:each="producto : ${productos}" 
+                                                    th:value="${producto.id}" 
+                                                    th:selected="${producto.id == detalle.producto.id}"
+                                                    th:data-price="${producto.precioDetalle}"
+                                                    th:text="${producto.nombre}">
+                                            </option>
+                                        </select>
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="form-label">Precio</label>
+                                        <input type="number" class="form-input" step="0.01" readonly name="precios" th:id="'price' + ${iterStat.index + 1}" th:value="${detalle.precioVentaUnidad}">
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="form-label">Cantidad</label>
+                                        <input type="number" class="form-input" min="1" onchange="updateLineTotal([[${iterStat.index} + 1]])" name="cantidades" th:id="'quantity' + ${iterStat.index + 1}" th:value="${detalle.cantidad}">
+                                    </div>
+                                    <div class="col-span-2">
+                                        <label class="form-label">Subtotal</label>
+                                        <input type="number" class="form-input" step="0.01" readonly th:id="'subtotal' + ${iterStat.index + 1}" th:value="${#numbers.formatDecimal(detalle.cantidad * detalle.precioVentaUnidad, 1, 2)}">
+                                    </div>
+                                    <div class="col-span-1">
+                                        <button type="button" 
+                                                th:onclick="'removeProductLine(' + (${iterStat.index} + 1) + ', ' + ${detalle.id.idProducto} + ')'"
+                                                class="btn btn-outline btn-sm" style="color: #dc2626;">
+                                            <i class="fa-solid fa-xmark icon"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Las líneas de productos nuevos se agregarán aquí -->
                         </div>
                     </div>
 
@@ -81,15 +122,34 @@
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
 
+    <!-- Product data for JavaScript -->
+    <div id="productData" th:data-productos="${productosJson}" style="display: none;"></div>
+
     <script>
         let productLineCounter = 0;
+        let availableProducts = [];
 
-        // Productos disponibles desde el backend
-        const availableProducts = [
-            <th:block th:each="producto : ${productos}">
-            { id: <span th:text="${producto.id}"></span>, name: '<span th:text="${producto.nombre}"></span>', price: <span th:text="${producto.precioDetalle}"></span> },
-            </th:block>
-        ];
+        // Load products from data attribute
+        function loadProducts() {
+            const productDataElement = document.getElementById('productData');
+            if (productDataElement) {
+                const productData = productDataElement.getAttribute('data-productos');
+                console.log('Raw product data:', productData);
+                if (productData) {
+                    try {
+                        availableProducts = JSON.parse(productData);
+                        console.log('Parsed products:', availableProducts);
+                    } catch (e) {
+                        console.error('Error parsing product data:', e);
+                        availableProducts = [];
+                    }
+                } else {
+                    console.error('No product data found');
+                }
+            } else {
+                console.error('Product data element not found');
+            }
+        }
 
         function addProductLine() {
             productLineCounter++;
@@ -98,12 +158,24 @@
             lineDiv.className = 'grid grid-cols-12 gap-2 items-end mb-3 p-3 border rounded-lg';
             lineDiv.id = `productLine${productLineCounter}`;
 
+            console.log('Adding product line, available products:', availableProducts);
+
+            // Build options HTML
+            let optionsHtml = '<option value="">Seleccionar producto</option>';
+            if (availableProducts && availableProducts.length > 0) {
+                availableProducts.forEach(function(product) {
+                    console.log('Processing product:', product);
+                    optionsHtml += `<option value="${product.id}" data-price="${product.precioDetalle}">${product.nombre}</option>`;
+                });
+            } else {
+                console.warn('No products available for selection');
+            }
+
             lineDiv.innerHTML = `
                 <div class="col-span-5">
                     <label class="form-label">Producto</label>
                     <select class="form-select" onchange="updatePrice(${productLineCounter})" name="productoIds" id="product${productLineCounter}">
-                        <option value="">Seleccionar producto</option>
-                        ${availableProducts.map(p => `<option value="${p.id}" data-price="${p.price}">${p.name}</option>`).join('')}
+                        ${optionsHtml}
                     </select>
                 </div>
                 <div class="col-span-2">
@@ -128,11 +200,28 @@
             container.appendChild(lineDiv);
         }
 
-        function removeProductLine(lineId) {
+        function removeProductLine(lineId, productId = null) {
+            console.log('removeProductLine called with:', lineId, productId);
             const line = document.getElementById(`productLine${lineId}`);
+            console.log('Found line element:', line);
+            
             if (line) {
+                // If this is an existing product (has productId), mark it for deletion
+                if (productId) {
+                    const form = document.querySelector('form');
+                    const hiddenInput = document.createElement('input');
+                    hiddenInput.type = 'hidden';
+                    hiddenInput.name = 'productosAEliminar';
+                    hiddenInput.value = productId;
+                    form.appendChild(hiddenInput);
+                    console.log('Marked existing product for deletion:', productId);
+                }
+                
                 line.remove();
                 updateTotal();
+                console.log('Product line removed successfully');
+            } else {
+                console.error('Could not find product line with ID:', `productLine${lineId}`);
             }
         }
 
@@ -172,9 +261,22 @@
             document.getElementById('totalAmount').textContent = total.toFixed(2);
         }
 
+
         // Add initial product line when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            addProductLine();
+            loadProducts();
+            
+            // Count existing product lines and set counter accordingly
+            const existingLines = document.querySelectorAll('#productLines .grid.grid-cols-12');
+            productLineCounter = existingLines.length;
+            
+            // Only add initial product line if not editing (no existing products)
+            if (productLineCounter === 0) {
+                addProductLine();
+            } else {
+                // Update totals for existing products
+                updateTotal();
+            }
         });
     </script>
 </body>
