@@ -6,6 +6,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "provincia")
+// Mapeo de la entidad provincia en la BD
 public class Provincia {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="id_provincia")

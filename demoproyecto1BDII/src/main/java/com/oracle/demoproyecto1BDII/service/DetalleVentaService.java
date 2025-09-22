@@ -42,21 +42,28 @@ public class DetalleVentaService {
         return repo.findByProductoId(productoId);
     }
     
-    // Business logic methods
+    // Calcula el subtotal de un detalle de venta.
+    // Multiplica la cantidad por el precio unitario,
+    // devolviendo cero si alguno de los valores es nulo.
     public BigDecimal calcularSubtotal(DetalleVenta detalle) {
         if (detalle.getCantidad() == null || detalle.getPrecioVentaUnidad() == null) {
             return BigDecimal.ZERO;
         }
         return detalle.getPrecioVentaUnidad().multiply(BigDecimal.valueOf(detalle.getCantidad()));
     }
-    
+
+    //Calcula el total de una venta sumando los subtotales
+    //de todos sus detalles asociados.
     public BigDecimal calcularTotalVenta(Long ventaId) {
         List<DetalleVenta> detalles = findByVentaId(ventaId);
         return detalles.stream()
                 .map(this::calcularSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
-    
+
+    // Valída que un detalle de venta sea correcto.
+    // Verifica que cantidad y precio unitario existan y sean mayores que cero,
+    // y que estén asociados tanto a una venta como a un producto.
     public boolean validarDetalle(DetalleVenta detalle) {
         return detalle.getCantidad() != null && detalle.getCantidad() > 0 &&
                detalle.getPrecioVentaUnidad() != null && detalle.getPrecioVentaUnidad().compareTo(BigDecimal.ZERO) > 0 &&

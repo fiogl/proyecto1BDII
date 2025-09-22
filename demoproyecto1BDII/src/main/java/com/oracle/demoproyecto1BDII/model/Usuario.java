@@ -5,6 +5,7 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "usuario")
+// Mapeo de la entidad usuario en la BD
 public class Usuario {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="id_usuario")

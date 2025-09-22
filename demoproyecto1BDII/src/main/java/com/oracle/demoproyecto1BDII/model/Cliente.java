@@ -3,6 +3,7 @@
     import jakarta.persistence.*;
     import lombok.Data;
 
+    // Mapeo de la entidad cliente en la BD
     @Entity
     @Data
     @Table(name = "clienteP")

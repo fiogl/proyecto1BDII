@@ -9,6 +9,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+//Controlador para gestionar los detalles de venta.
+//Permite listar, crear, editar, eliminar y consultar detalles de venta
+//asociados a productos y ventas.
+
 @Controller
 @RequestMapping("/detalleVenta")
 public class DetalleVentaController {
@@ -16,18 +20,21 @@ public class DetalleVentaController {
     private final VentaService ventaService;
     private final ProductoService productoService;
 
+    //Constructor que inyecta los servicios necesarios
     public DetalleVentaController(DetalleVentaService service, VentaService ventaService, ProductoService productoService) {
         this.service = service;
         this.ventaService = ventaService;
         this.productoService = productoService;
     }
 
+    //Lista todos los detalles de venta.
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("detalleVentas", service.listar());
         return "detalleVenta/listar";
     }
 
+    //Muestra el formulario para crear un nuevo detalle de venta.
     @GetMapping("/nuevo")
     public String nuevo(Model model) {
         DetalleVenta detalleVenta = new DetalleVenta();
@@ -38,6 +45,7 @@ public class DetalleVentaController {
         return "detalleVenta/form";
     }
 
+    //Guarda un detalle de venta nuevo o editado si es válido.
     @PostMapping
     public String guardar(@ModelAttribute DetalleVenta detalleVenta) {
         if (service.validarDetalle(detalleVenta)) {
@@ -46,6 +54,7 @@ public class DetalleVentaController {
         return "redirect:/detalleVenta";
     }
 
+    //Muestra el formulario para editar un detalle de venta existente.
     @GetMapping("/editar/{ventaId}/{productoId}")
     public String editar(@PathVariable Long ventaId, @PathVariable Long productoId, Model model) {
         DetalleVentaId id = new DetalleVentaId(ventaId, productoId);
@@ -59,6 +68,7 @@ public class DetalleVentaController {
         return "detalleVenta/form";
     }
 
+    //Elimina un detalle de venta por su ID compuesto.
     @GetMapping("/eliminar/{ventaId}/{productoId}")
     public String eliminar(@PathVariable Long ventaId, @PathVariable Long productoId) {
         DetalleVentaId id = new DetalleVentaId(ventaId, productoId);
@@ -66,6 +76,7 @@ public class DetalleVentaController {
         return "redirect:/detalleVenta";
     }
 
+    //Lista todos los detalles de venta de una venta específica.
     @GetMapping("/venta/{ventaId}")
     public String findByVenta(@PathVariable Long ventaId, Model model) {
         model.addAttribute("detalleVentas", service.findByVentaId(ventaId));

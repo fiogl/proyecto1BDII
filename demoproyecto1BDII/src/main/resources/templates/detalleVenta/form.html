@@ -76,7 +76,7 @@
     <footer th:replace="~{fragments/layout :: footer}"></footer>
 
     <script>
-        // Calculate subtotal when quantity or price changes
+        // Calcula subtotal cuando la cantidad o el precio cambian
         function calculateSubtotal() {
             const cantidad = parseFloat(document.querySelector('input[name="cantidad"]').value) || 0;
             const precio = parseFloat(document.querySelector('input[name="precioVentaUnidad"]').value) || 0;
@@ -84,7 +84,7 @@
             document.getElementById('subtotalDisplay').textContent = '$' + subtotal.toFixed(2);
         }
 
-        // Add event listeners
+        // Añade event listeners
         document.addEventListener('DOMContentLoaded', function() {
             const cantidadInput = document.querySelector('input[name="cantidad"]');
             const precioInput = document.querySelector('input[name="precioVentaUnidad"]');
@@ -92,7 +92,7 @@
             if (cantidadInput) cantidadInput.addEventListener('input', calculateSubtotal);
             if (precioInput) precioInput.addEventListener('input', calculateSubtotal);
             
-            // Calculate initial subtotal
+            // Calcula subtotal inicial
             calculateSubtotal();
         });
     </script>

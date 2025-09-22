@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 @Data
 @Table(name = "venta")
-
+// Mapeo de la entidad venta en la BD
 public class Venta {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="id_venta")

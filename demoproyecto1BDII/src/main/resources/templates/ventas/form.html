@@ -67,11 +67,14 @@
                                      class="grid grid-cols-12 gap-2 items-end mb-3 p-3 border rounded-lg bg-blue-50">
 
                                     <div class="col-span-5">
-                                        <label class="form-label">Producto</label>
+                                        <label class="form-label"
+                                               th:for="'product' + (${iterStat.index + 1})">Producto</label>
+
                                         <select class="form-select"
                                                 th:id="'product' + (${iterStat.index + 1})"
                                                 name="productoIds"
-                                                th:onchange="'updatePrice(' + (${iterStat.index + 1}) + ')'" >
+                                                th:onchange="'updatePrice(' + (${iterStat.index + 1}) + ')'"
+                                                required>
                                             <option value="">Seleccionar producto</option>
                                             <option th:each="producto : ${productos}"
                                                     th:value="${producto.id}"
@@ -115,7 +118,6 @@
 
                                 </div>
                             </div>
-                            <!-- Las líneas de productos nuevos se agregarán aquí -->
                         </div>
                     </div>
 
@@ -192,7 +194,7 @@
             lineDiv.innerHTML = `
                 <div class="col-span-5">
                     <label class="form-label">Producto</label>
-                    <select class="form-select" onchange="updatePrice(${productLineCounter})" name="productoIds" id="product${productLineCounter}">
+                    <select class="form-select" onchange="updatePrice(${productLineCounter})" name="productoIds" id="product${productLineCounter}" required>
                         ${optionsHtml}
                     </select>
                 </div>
@@ -216,13 +218,14 @@
             `;
 
             container.appendChild(lineDiv);
+            updateRemoveButtons();
         }
 
         function removeProductLine(lineId, productId = null) {
             console.log('removeProductLine called with:', lineId, productId);
             const line = document.getElementById(`productLine${lineId}`);
             console.log('Found line element:', line);
-            
+
             if (line) {
                 // If this is an existing product (has productId), mark it for deletion
                 if (productId) {
@@ -234,9 +237,10 @@
                     form.appendChild(hiddenInput);
                     console.log('Marked existing product for deletion:', productId);
                 }
-                
+
                 line.remove();
                 updateTotal();
+                updateRemoveButtons();
                 console.log('Product line removed successfully');
             } else {
                 console.error('Could not find product line with ID:', `productLine${lineId}`);
@@ -279,15 +283,26 @@
             document.getElementById('totalAmount').textContent = total.toFixed(2);
         }
 
+        function updateRemoveButtons() {
+            const lines = document.querySelectorAll('#productLines .grid.grid-cols-12');
+            lines.forEach(line => {
+                const btnContainer = line.querySelector('div.col-span-1');
+                if (lines.length <= 1) {
+                    btnContainer.style.display = 'none';  // oculta el borón
+                } else {
+                    btnContainer.style.display = 'block'; // vuelve a mostrarlo
+                }
+            });
+        }
 
         // Add initial product line when page loads
         document.addEventListener('DOMContentLoaded', function() {
             loadProducts();
-            
+
             // Count existing product lines and set counter accordingly
             const existingLines = document.querySelectorAll('#productLines .grid.grid-cols-12');
             productLineCounter = existingLines.length;
-            
+
             // Only add initial product line if not editing (no existing products)
             if (productLineCounter === 0) {
                 addProductLine();

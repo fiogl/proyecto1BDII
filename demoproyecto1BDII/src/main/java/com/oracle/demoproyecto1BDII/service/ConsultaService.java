@@ -11,12 +11,15 @@ import java.util.List;
 @Service
 public class ConsultaService {
 
+    //Java Database Connectivity
     private final JdbcTemplate jdbcTemplate;
 
     public ConsultaService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    // Recibe el select de la consulta para marcas más vendidas
+    // y lo convierte en objetos MarcaVentaDTO
     public List<MarcaVentaDTO> getMarcasMasVendidas() {
         SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
                 .withCatalogName("pk_consultas")
@@ -32,6 +35,8 @@ public class ConsultaService {
         return (List<MarcaVentaDTO>) jdbcCall.execute().get("m_cursor");
     }
 
+    // Recibe el select de la consulta para ventas por clientes
+    // y lo convierte en objetos VentaClienteDTO
     public List<VentaClienteDTO> getVentasPorCliente() {
         SimpleJdbcCall jdbcCall = new SimpleJdbcCall(jdbcTemplate)
                 .withCatalogName("pk_consultas")        // package de Oracle

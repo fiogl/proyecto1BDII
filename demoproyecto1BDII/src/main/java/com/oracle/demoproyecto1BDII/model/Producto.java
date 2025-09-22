@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 @Data
 @Entity
 @Table(name = "producto")
+// Mapeo de la entidad producto en la BD
 public class Producto {
     @Id @GeneratedValue(strategy=GenerationType.IDENTITY)
     @Column(name="id_producto")

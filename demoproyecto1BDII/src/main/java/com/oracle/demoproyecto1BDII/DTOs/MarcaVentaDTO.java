@@ -2,6 +2,7 @@ package com.oracle.demoproyecto1BDII.DTOs;
 
 import java.math.BigDecimal;
 
+// El cuerpo de la consulta ventas por marca
 public class MarcaVentaDTO {
     private String marca;
     private int totalVendido;

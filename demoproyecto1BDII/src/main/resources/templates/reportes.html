@@ -70,7 +70,7 @@
                                             <div>
                                                 <div class="font-semibold">Ganancia general</div>
                                                 <div class="text-lg" style="color: var(--primary);"
-                                                     th:text="${'₡' +totalVendidoGeneral}">₡0</div>
+                                                     th:text="${'₡' +totalRecaudadoMarcas}">₡0</div>
                                             </div>
                                         </div>
                                     </div>
@@ -113,20 +113,20 @@
     <footer th:replace="~{fragments/layout :: footer}"></footer>
     <script>
         function showTab(tabName) {
-            // Ocultar todas las secciones
+            // Oculta todas las secciones
             document.querySelectorAll('.report-section').forEach(section => {
                 section.classList.add('hidden');
             });
 
-            // Remover clase active de todos los botones
+            // Remueve la clase active de todos las pestañas
             document.querySelectorAll('.tab-button').forEach(button => {
                 button.classList.remove('active');
             });
 
-            // Mostrar la sección seleccionada
+            // Muestra la sección seleccionada
             document.getElementById(`report-${tabName}`).classList.remove('hidden');
 
-            // Activar el botón seleccionado
+            // Activa el botón seleccionado
             document.getElementById(`tab-${tabName}`).classList.add('active');
         }
     </script>

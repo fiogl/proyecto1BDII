@@ -2,6 +2,7 @@ package com.oracle.demoproyecto1BDII.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+// Mapeo de la entidad categoría en la BD
 @Entity
 @Data
 @Table(name="categoria")

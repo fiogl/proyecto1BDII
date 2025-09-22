@@ -15,6 +15,8 @@ public class DetallesUsuarioService implements UserDetailsService {
         this.repo = repo;
     }
 
+    // Metodo para Spring Security, busca un usuario y si lo encuentra
+    // construye un objeto UserDetails que usa para autenticar y autorizar
     @Override
     public UserDetails loadUserByUsername(String nombreUsuario) throws UsernameNotFoundException {
         var u = repo.findUsuarioByNombreUsuario(nombreUsuario)

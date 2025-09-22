@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @Data
 @Table(name = "detalle_venta")
 
+// Mapeo de la entidad detalle_venta en la BD
 public class DetalleVenta {
     @EmbeddedId
     private DetalleVentaId id;

@@ -2,6 +2,7 @@ package com.oracle.demoproyecto1BDII.DTOs;
 
 import java.math.BigDecimal;
 
+//El cuerpo de la consulta Ventas por cliente
 public class VentaClienteDTO {
     private long idCliente;
     private String cliente;

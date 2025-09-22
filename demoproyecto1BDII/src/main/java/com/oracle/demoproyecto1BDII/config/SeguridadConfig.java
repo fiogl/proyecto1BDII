@@ -11,7 +11,13 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+//Configuración de seguridad de Spring Security para la aplicación.
+//Define reglas de autenticación, autorización, login y logout.
 public class SeguridadConfig {
+    //Configura la cadena de filtros de seguridad.
+    // - Configura login personalizado con URL de procesamiento,
+    //   URL de éxito y URL de fallo.
+    // - Configura logout con URL de cierre de sesión y redirección.
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, UserDetailsService userDetailsService) throws Exception {
         http
@@ -33,6 +39,8 @@ public class SeguridadConfig {
         return http.build();
     }
 
+    //Bean que define el codificador de contraseñas.
+    //Utiliza BCrypt para almacenar las contraseñas de forma segura.
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
