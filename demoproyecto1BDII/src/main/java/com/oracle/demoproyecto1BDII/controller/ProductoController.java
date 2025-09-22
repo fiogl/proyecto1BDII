@@ -69,7 +69,7 @@ public class ProductoController {
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         if (id != null) {
-                int resultado = service.eliminarProducto(id); // 1 = eliminado, 0 = no eliminado
+                int resultado = service.eliminarProducto(id); // 0 = eliminado, 1 = no eliminado, -1 = con productos asociados
                 if (resultado == 0) {
                     redirectAttrs.addFlashAttribute("mensajeExito", "Producto eliminado correctamente.");
                 } else if (resultado == -1) {
@@ -77,7 +77,6 @@ public class ProductoController {
                 }else {
                     redirectAttrs.addFlashAttribute("mensajeError", "El producto que se intentó eliminar no existía.");
                 }
-
         }
         return "redirect:/productos";
     }

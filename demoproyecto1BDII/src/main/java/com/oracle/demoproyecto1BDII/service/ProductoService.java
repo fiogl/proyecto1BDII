@@ -32,7 +32,6 @@ public class ProductoService {
     public int eliminarProducto(Long productoId) {
         Map<String, Object> inParams = new HashMap<>();
         inParams.put("P_PRODUCTO_ID", productoId);
-
         try {
             // Ejecuta la función y recibe un BigDecimal
             Number resultado = eliminarProductoCall.executeFunction(Number.class, inParams);

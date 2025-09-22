@@ -47,8 +47,6 @@ public class VentaController {
             totales.put(v.getId(), total);
         }
 
-
-
         model.addAttribute("ventas", ventasL);
         model.addAttribute("totales", totales);
         model.addAttribute("activePage", "ventas");
