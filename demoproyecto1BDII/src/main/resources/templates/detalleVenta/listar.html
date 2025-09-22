@@ -68,7 +68,7 @@
                                 </div>
                             </td>
                         </tr>
-                        <tr th:if="${detalleVentas == null or detalleVentas.empty}">
+                        <tr th:if="${detalleVentas == null or detalleVentas.isEmpty()}">
                             <td colspan="6" class="text-center p-6 text-gray-500">
                                 No hay detalles de venta registrados.
                                 <a th:href="@{/detalleVenta/nuevo}" class="btn btn-primary btn-sm mt-2">

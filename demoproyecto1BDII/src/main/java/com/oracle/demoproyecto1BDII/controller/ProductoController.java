@@ -3,9 +3,11 @@ import com.oracle.demoproyecto1BDII.model.Producto;
 import com.oracle.demoproyecto1BDII.service.ProductoService;
 import com.oracle.demoproyecto1BDII.service.CategoriaService;
 import com.oracle.demoproyecto1BDII.service.MarcaService;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 //Controlador para gestionar productos.
 //Permite listar, crear, editar y eliminar productos,
@@ -63,11 +65,19 @@ public class ProductoController {
         return "productos/form";
     }
 
-    //Elimina un producto por su ID si existe.
+    //Elimina un producto por su ID o muestra error si el producto tenía ventas asociadas
     @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id) {
+    public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         if (id != null) {
-            service.eliminar(id);
+                int resultado = service.eliminarProducto(id); // 1 = eliminado, 0 = no eliminado
+                if (resultado == 0) {
+                    redirectAttrs.addFlashAttribute("mensajeExito", "Producto eliminado correctamente.");
+                } else if (resultado == -1) {
+                    redirectAttrs.addFlashAttribute("mensajeError", "No se pudo eliminar el producto porque tenía ventas asociadas.");
+                }else {
+                    redirectAttrs.addFlashAttribute("mensajeError", "El producto que se intentó eliminar no existía.");
+                }
+
         }
         return "redirect:/productos";
     }

@@ -68,13 +68,6 @@ public class DetalleVentaController {
         return "detalleVenta/form";
     }
 
-    //Elimina un detalle de venta por su ID compuesto.
-    @GetMapping("/eliminar/{ventaId}/{productoId}")
-    public String eliminar(@PathVariable Long ventaId, @PathVariable Long productoId) {
-        DetalleVentaId id = new DetalleVentaId(ventaId, productoId);
-        service.eliminar(id);
-        return "redirect:/detalleVenta";
-    }
 
     //Lista todos los detalles de venta de una venta específica.
     @GetMapping("/venta/{ventaId}")

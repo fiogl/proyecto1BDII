@@ -21,6 +21,16 @@
                     </a>
                 </div>
 
+                <!-- Mensaje de éxito -->
+                <div th:if="${mensajeExito}" class="alert alert-success">
+                    <span th:text="${mensajeExito}"></span>
+                </div>
+
+                <!-- Mensaje de error -->
+                <div th:if="${mensajeError}" class="alert alert-danger">
+                    <span th:text="${mensajeError}"></span>
+                </div>
+
                 <!-- Tabla de productos -->
                 <div class="card">
                     <table class="table">

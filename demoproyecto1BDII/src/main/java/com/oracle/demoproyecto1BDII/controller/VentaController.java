@@ -10,6 +10,7 @@ import com.oracle.demoproyecto1BDII.service.DetalleVentaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -46,6 +47,8 @@ public class VentaController {
             totales.put(v.getId(), total);
         }
 
+
+
         model.addAttribute("ventas", ventasL);
         model.addAttribute("totales", totales);
         model.addAttribute("activePage", "ventas");
@@ -65,7 +68,7 @@ public class VentaController {
         model.addAttribute("venta", venta);
         model.addAttribute("clientes", clienteService.listar());
         model.addAttribute("productos", productoService.listar());
-        
+
         // Crea JSON string para JavaScript
         List<Producto> productos = productoService.listar();
         StringBuilder productosJson = new StringBuilder("[");
@@ -80,24 +83,24 @@ public class VentaController {
         }
         productosJson.append("]");
         model.addAttribute("productosJson", productosJson.toString());
-        
+
         return "ventas/form";
     }
 
     //Guarda una venta nueva junto con sus detalles de productos
     @PostMapping
-    public String guardar(@ModelAttribute Venta venta, 
+    public String guardar(@ModelAttribute Venta venta,
                          @RequestParam(value = "productoIds", required = false) List<Long> productoIds,
                          @RequestParam(value = "cantidades", required = false) List<Long> cantidades,
                          @RequestParam(value = "precios", required = false) List<String> precios) {
-        
+
         // Guarda la venta
         Venta ventaGuardada = service.guardar(venta);
-        
+
         // Crea DetalleVenta si se seleccionaron productos
-        if (productoIds != null && cantidades != null && precios != null && 
+        if (productoIds != null && cantidades != null && precios != null &&
             productoIds.size() == cantidades.size() && cantidades.size() == precios.size()) {
-            
+
             for (int i = 0; i < productoIds.size(); i++) {
                 if (productoIds.get(i) != null && cantidades.get(i) != null && cantidades.get(i) > 0) {
                     try {
@@ -107,7 +110,7 @@ public class VentaController {
                         detalle.setProducto(productoService.buscar(productoIds.get(i)));
                         detalle.setCantidad(cantidades.get(i));
                         detalle.setPrecioVentaUnidad(new java.math.BigDecimal(precios.get(i)));
-                        
+
                         if (detalleVentaService.validarDetalle(detalle)) {
                             detalleVentaService.guardar(detalle);
                         }
@@ -118,19 +121,19 @@ public class VentaController {
                 }
             }
         }
-        
+
         return "redirect:/ventas";
     }
 
     //Actualiza una venta existente y sus detalles
     @PostMapping("/editar/{id}")
-    public String actualizar(@PathVariable Long id, 
+    public String actualizar(@PathVariable Long id,
                            @ModelAttribute Venta venta,
                            @RequestParam(value = "productoIds", required = false) List<Long> productoIds,
                            @RequestParam(value = "cantidades", required = false) List<Long> cantidades,
                            @RequestParam(value = "precios", required = false) List<String> precios,
                            @RequestParam(value = "productosAEliminar", required = false) List<Long> productosAEliminar) {
-        
+
         // Actualiza la venta
         venta.setId(id);
         Venta ventaActualizada = service.guardar(venta);
@@ -147,14 +150,14 @@ public class VentaController {
                 }
             }
         }
-        
+
         // Elmina todos los detalleVentas previos para crear nuevo actualizados
         detalleVentaService.deleteByVentaId(id);
-        
+
         //Crea DetalleVenta si se seleccionaron productos
-        if (productoIds != null && cantidades != null && precios != null && 
+        if (productoIds != null && cantidades != null && precios != null &&
             productoIds.size() == cantidades.size() && cantidades.size() == precios.size()) {
-            
+
             for (int i = 0; i < productoIds.size(); i++) {
                 if (productoIds.get(i) != null && cantidades.get(i) != null && cantidades.get(i) > 0) {
                     try {
@@ -164,7 +167,7 @@ public class VentaController {
                         detalle.setProducto(productoService.buscar(productoIds.get(i)));
                         detalle.setCantidad(cantidades.get(i));
                         detalle.setPrecioVentaUnidad(new java.math.BigDecimal(precios.get(i)));
-                        
+
                         if (detalleVentaService.validarDetalle(detalle)) {
                             detalleVentaService.guardar(detalle);
                         }
@@ -193,11 +196,11 @@ public class VentaController {
         model.addAttribute("venta", venta);
         model.addAttribute("clientes", clienteService.listar());
         model.addAttribute("productos", productoService.listar());
-        
+
         // Consigue los detalleVenta de la venta a editar
         List<DetalleVenta> detallesExistentes = detalleVentaService.findByVentaId(id);
         model.addAttribute("detallesExistentes", detallesExistentes);
-        
+
         // Convierte la lista productos en una cadena JSON para JavaScript
         List<Producto> productos = productoService.listar();
         StringBuilder productosJson = new StringBuilder("[");
@@ -212,15 +215,21 @@ public class VentaController {
         }
         productosJson.append("]");
         model.addAttribute("productosJson", productosJson.toString());
-        
+
         return "ventas/form";
     }
 
-    // Elimina una venta por su ID
+    // Elimina una venta por su ID usando un procedimiento del paquete de operaciones
     @GetMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable Long id) {
+    public String eliminar(@PathVariable Long id, RedirectAttributes redirectAttrs) {
         if (id != null) {
-            service.eliminar(id);
+            try {
+                service.eliminarVenta(id);
+                redirectAttrs.addFlashAttribute("mensajeExito", "Venta eliminada correctamente.");
+            } catch (RuntimeException e) {
+                // Aquí puedes personalizar el mensaje según la excepción
+                redirectAttrs.addFlashAttribute("mensajeError", "No se pudo eliminar la venta: " + e.getMessage());
+            }
         }
         return "redirect:/ventas";
     }

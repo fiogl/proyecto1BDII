@@ -2,15 +2,19 @@ package com.oracle.demoproyecto1BDII.service;
 import com.oracle.demoproyecto1BDII.model.DetalleVenta;
 import com.oracle.demoproyecto1BDII.model.DetalleVentaId;
 import com.oracle.demoproyecto1BDII.repo.DetalleVentaRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
+
+
 
 @Service
 public class DetalleVentaService {
     private final DetalleVentaRepository repo;
 
-    public DetalleVentaService(DetalleVentaRepository repo) {
+
+    public DetalleVentaService(DetalleVentaRepository repo, JdbcTemplate jdbcTemplate) {
         this.repo = repo;
     }
 
